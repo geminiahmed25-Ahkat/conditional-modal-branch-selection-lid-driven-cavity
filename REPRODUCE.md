@@ -93,6 +93,21 @@ a run, proving that `data/` and `results/` come from exactly this pipeline.
 | `B3_seed0_E025` | 0.532 |
 | `B2_seed5_E025` | 0.003 |
 
+## 6. Rebuilding the manuscript PDF (optional)
+
+The 14 manuscript figures (`fig01_*.pdf` … `fig14_*.pdf`, PDF + PNG) sit at the
+**repository root** and are referenced without a directory prefix, so LaTeX must
+be run **from the repository root** (not from `manuscript/`):
+
+```powershell
+cd <repository root>
+pdflatex -interaction=nonstopmode manuscript\manuscript.tex   # 2 passes
+pdflatex -interaction=nonstopmode manuscript\manuscript.tex
+```
+
+Tested with MiKTeX: 25 pages, no errors, all 10 embedded figures resolved.
+The compiled PDF is committed at `manuscript/manuscript.pdf`.
+
 ## Notes for reviewers
 
 - The **temporal branches** (B2, B3) require the `stat_cycles = 48` solver patch
