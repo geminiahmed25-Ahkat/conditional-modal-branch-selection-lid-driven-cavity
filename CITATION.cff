@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this dataset or code, please cite the associated article."
+title: "Energy-matched lid-drive control classes in a lid-driven cavity: mechanistic case study (Re = 500, E* = 0.25)"
+abstract: >-
+  Code, data and figures for a focused fixed-energy comparison of four lid-drive
+  control classes (uniform, stationary second harmonic, mixed spatio-temporal,
+  pure temporal) in a lid-driven cavity at Re = 500, aspect ratio 1, with the
+  actuation-energy budget E* = 0.25 held identical across all four controls.
+  The study isolates the role of the spatio-temporal structure of the control on
+  circulation, strain-rate dissipation, wall shear and the field-mean/fluctuation
+  partition. Includes the vendored LBM-MRT solver, the PINN module of the
+  companion paper, the 15 PINN seed checkpoints used to build the controls, and
+  the full reproduction pipeline with SHA256 verification.
+type: software
+license: MIT
+repository-code: "https://github.com/PLACEHOLDER_ACCOUNT/PLACEHOLDER_REPO"
+keywords:
+  - lattice Boltzmann method
+  - MRT collision
+  - lid-driven cavity
+  - flow control
+  - physics-informed neural network
+  - modal decomposition
+  - dissipation
+authors:
+  - family-names: "Benaiche"
+    given-names: "Ahmed"
+    affiliation: "Independent researcher"

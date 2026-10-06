@@ -1,0 +1,13 @@
+# Environnement de reproduction (relevé le 2026-09-15)
+python  : py -3.11  (C:\Program Files\Python311\python.exe)
+numpy   : 2.2.6
+numba   : 0.61.2
+torch   : 2.12.1+cu126
+matplotlib : 3.10.9
+
+# Sources importées (non copiées, chemins absolus dans config.json)
+lbm_mrt_pinn_validation.py : PoF_R_lid_driven_paper/lbm_mrt_validation/ (D2Q9 MRT, numba)
+PINN_Lid_driven_reviewers.py : PoF_R_lid_driven_paper/ (construction UltraPINN et U_lid)
+
+# Modèles PINN utilisés pour le PINN(mean)
+Paper2_branch_selection/results/01_ReE_star_map/re500_e0.25/seed_{0..14}/model.pt (state_dict torch)

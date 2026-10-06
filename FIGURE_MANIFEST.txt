@@ -1,0 +1,14 @@
+fig01_branch_selection_map	Main: broad branch-selection landscape over (Re,E*)
+fig02_branch_observable_space	Main: empirical branch-class separation in (f2, ft) space
+fig03_lambda_branch_probabilities	Main: branch probability redistribution with lambda_var
+fig04_lambda_entropy	Main: normalized branch-selection entropy
+fig05_energy_sweep	Main: actuation-energy sensitivity
+fig06_seed_multiplicity	Main: seed-to-seed multiplicity
+fig07_loss_ablation	Main: variance-regularization branch selection
+fig08_capacity_truncation	Main/Supplement: architecture and modal-capacity robustness
+fig09_aspect_ratio	Main: geometry dependence
+fig10_parametrization_dependence	Main: Fourier vs modified-Chebyshev
+fig11_lbm_dissipation	Main: independent LBM dissipation verification
+fig12_gci_updated	Main: updated three-grid convergence/GCI
+fig13_quasistationarity	Main: independent dynamical verification
+fig14_symbolic_loco	Optional: symbolic-regression interpretability

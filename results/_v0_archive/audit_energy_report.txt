@@ -1,0 +1,41 @@
+==============================================================================
+PHASE 0 — AUDIT dissipation / bilan énergétique (case study 15_09_2026)
+Convention testée :  Φ = ν(2S11² + 2S22² + 4S12²)  =  2ν S:S
+= (2/Re)[u_x² + v_y² + ½(u_y + v_x)²]  (standard, ν = 1/Re)
+==============================================================================
+
+[pinn_mean_Re500_N128] N=128 Re=500 period=128
+  1. ε recalculé  eps=1.243522e-03  xx=2.436491e-04  yy=2.418562e-04  xy=7.580169e-04
+     |Δ| max vs scalars.json = 0.00e+00  -> OK
+  3. ux[N-1,:] vs U_lid imposé : max|Δ| = 2.41e-02  -> ÉCART !
+  4. P_lid(order 1) = 1.300315e-03   P_lid/ε = 1.0457   |P−ε|/ε = 0.0457   (scalars.json P_lid=1.300315e-03, P_lid/eps=1.0457)
+  4. P_lid(order 2) = -1.385268e-03   P_lid/ε = -1.1140   |P−ε|/ε = 2.1140   (scalars.json P_lid=1.300315e-03, P_lid/eps=1.0457)
+     tau_w sauvegardé : min=-1.001e-02 max=1.104e-02
+
+[sin_2pi_Re500_N128] N=128 Re=500 period=128
+  1. ε recalculé  eps=9.348187e-03  xx=1.117067e-03  yy=1.101866e-03  xy=7.129254e-03
+     |Δ| max vs scalars.json = 0.00e+00  -> OK
+  3. ux[N-1,:] vs U_lid imposé : max|Δ| = 8.13e-02  -> ÉCART !
+  4. P_lid(order 1) = 1.011638e-02   P_lid/ε = 1.0822   |P−ε|/ε = 0.0822   (scalars.json P_lid=1.011638e-02, P_lid/eps=1.0822)
+  4. P_lid(order 2) = -1.088925e-02   P_lid/ε = -1.1649   |P−ε|/ε = 2.1649   (scalars.json P_lid=1.011638e-02, P_lid/eps=1.0822)
+     tau_w sauvegardé : min=-3.618e-02 max=3.618e-02
+
+[uniform_Re500_N128] N=128 Re=500 period=128
+  1. ε recalculé  eps=3.565525e-02  xx=3.781958e-03  yy=3.758466e-03  xy=2.811482e-02
+     |Δ| max vs scalars.json = 0.00e+00  -> OK
+  3. ux[N-1,:] vs U_lid imposé : max|Δ| = 7.31e-01  -> ÉCART !
+  4. P_lid(order 1) = 4.208065e-02   P_lid/ε = 1.1802   |P−ε|/ε = 0.1802   (scalars.json P_lid=4.208065e-02, P_lid/eps=1.1802)
+  4. P_lid(order 2) = -4.747282e-02   P_lid/ε = -1.3314   |P−ε|/ε = 2.3314   (scalars.json P_lid=4.208065e-02, P_lid/eps=1.1802)
+     tau_w sauvegardé : min=1.985e-02 max=1.610e-01
+
+==============================================================================
+AUDIT — Interprétation :
+ * ε(⟨u⟩) est la dissipation du champ MOYEN. Pour les contrôles temporels
+   (B2/B3, period>1) le bilan total P_lid ≈ ε_mean + ε_fluct ; R_K = K_fluct/K_mean
+   quantifie l'unsteadiness — à ajouter aux diagnostics des cas temporels.
+ * P_lid/ε > 1 à N=128 : erreur 1er/2e ordre du gradient pariétal ; 
+   attendu < 5 % à N=256.
+==============================================================================
+
+  τ_w convention : τ_w = ν·(∂u/∂y)(y=lid), traction sur le fluide, 
+  P_lid = +∫_lid U_lid·τ_w dx > 0 (puissance injectée par le couvercle).

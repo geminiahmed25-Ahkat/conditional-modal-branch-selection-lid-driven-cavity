@@ -1,0 +1,4 @@
+numpy>=1.26
+numba>=0.61
+torch>=2.4          # requis par build_controls.py (import PINN_Lid_driven_reviewers)
+matplotlib>=3.8

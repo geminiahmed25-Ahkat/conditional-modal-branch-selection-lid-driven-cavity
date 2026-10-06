@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# LaTeX / build artefacts
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Raw LBM fields (large binary, 148 MB) - excluded on purpose.
+# Their integrity is documented in results/FIELDS_NOT_IN_REPO.csv (SHA256).
+results/**/*.npz
+results/_v0_archive/**/*.npz
+results/backup_*/**/*.npz
+
+# Working notes (not part of the release)
+a faire.txt
+config.json.machine_old_backup
+
+# OS / editors
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/

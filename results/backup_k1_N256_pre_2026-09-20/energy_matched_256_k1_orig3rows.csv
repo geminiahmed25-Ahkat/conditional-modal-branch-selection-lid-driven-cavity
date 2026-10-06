@@ -1,0 +1,4 @@
+A2,E_star,U0_uniform,eps_B1,eps_uniform,ratio_B1_over_uniform,control_B1,control_UN,tokens
+0.600000,0.180000,0.424264,4.687290e-03,6.633981e-03,0.706558,S1em_0p6,UNem_0p424264,B=reused+U=reused
+0.658000,0.216482,0.465276,5.818966e-03,8.113367e-03,0.717207,S1em_0p658,UNem_0p465276,B=reused+U=reused
+0.707107,0.250000,0.500000,6.891180e-03,9.497998e-03,0.725540,S1em_0p707107,uniform_E025,B=reused+U=reused

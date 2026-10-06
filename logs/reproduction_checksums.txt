@@ -1,0 +1,41 @@
+# Reproduction case study 15_09_2026 — checksums SHA256 (16 hex)
+# généré le 2026-09-16 00:59:32
+# config : N=256 max_iter=5000000 tol=1e-09
+results\case_controls_energy.csv	cc360cf630cfcf79
+results\case_study_summary.csv	69e6256707b6bc4a
+results\fields_B1_E025_Re500_N128.npz	eb4c49f412f135f8
+results\fields_B1_E025_Re500_N256.npz	b36f18428fcc0b0b
+results\fields_B2_seed5_E025_Re500_N128.npz	e6f0c007bf3dce96
+results\fields_B2_seed5_E025_Re500_N256.npz	4374c9d5cd989d24
+results\fields_B3_seed0_E025_Re500_N128.npz	4d9abef2bbcf0a9d
+results\fields_B3_seed0_E025_Re500_N256.npz	cb95ed97e3787b54
+results\fields_uniform_E025_Re500_N128.npz	adfcd492b800a4f9
+results\fields_uniform_E025_Re500_N256.npz	6ab70b2eacdfe5bd
+results\fig_summary_numbers.csv	0224f995711364fa
+results\scalars_B1_E025_Re500_N128.json	15be7667ef2ad516
+results\scalars_B1_E025_Re500_N256.json	a6edf973503d02c9
+results\scalars_B2_seed5_E025_Re500_N128.json	9458e7e91bb580d5
+results\scalars_B2_seed5_E025_Re500_N256.json	a652718eafa4a79b
+results\scalars_B3_seed0_E025_Re500_N128.json	715ab67f2accf8bd
+results\scalars_B3_seed0_E025_Re500_N256.json	a93c6a599decfa88
+results\scalars_uniform_E025_Re500_N128.json	2566205f18eb4909
+results\scalars_uniform_E025_Re500_N256.json	f4ac8b1ee9b3f5cd
+results\seed_controls_re500_e0.25.csv	8df87de8e3895088
+results\_v0_archive\audit_energy_report.txt	a4da93928b74f4f5
+results\_v0_archive\case_study_summary.csv	a11b2051fd303049
+results\_v0_archive\fields_pinn_mean_Re500_N128.npz	ed00d527242400b0
+results\_v0_archive\fields_sin_2pi_Re500_N128.npz	e4892471701f2573
+results\_v0_archive\fields_uniform_Re500_N128.npz	c78f8d73f70ba413
+results\_v0_archive\fig_summary_numbers.csv	4c6d995ca4982747
+results\_v0_archive\scalars_pinn_mean_Re500_N128.json	096b07b4fa0d9866
+results\_v0_archive\scalars_sin_2pi_Re500_N128.json	8e2e939aedf1ddc5
+results\_v0_archive\scalars_uniform_Re500_N128.json	76a3effaa88ce6d0
+results\_v0_archive\seed_controls_re500_e0.25.csv	45e99e4ec001718c
+data\inputs\fourier_Re500.npz	b34839c61be2c702
+data\lid_series\B1_E025_re500_e0.25.npz	39d22a5bc0d963fe
+data\lid_series\B2_seed5_E025_re500_e0.25.npz	bc5cc1da8d4e79ea
+data\lid_series\B3_seed0_E025_re500_e0.25.npz	320d87a4bb6da989
+data\lid_series\pinn_mean_re500_e0.25.npz	36674b890f8b4a04
+data\lid_series\sin_2pi_re500_e0.25.npz	06ad66a98e49f57d
+data\lid_series\uniform_E025_re500_e0.25.npz	9c47be8b9bfc505f
+data\lid_series\uniform_re500_e0.25.npz	edca2e5f996c92dd

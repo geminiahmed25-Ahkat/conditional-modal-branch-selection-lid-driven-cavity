@@ -1,0 +1,111 @@
+{
+  "study": {
+    "name": "paper_2_case_study_15_09_2026",
+    "title": "Focused fixed-energy comparison of the physical consequences of competing control classes",
+    "operation_point": {"Re": 500, "E_star": 0.25, "AR": 1.0},
+    "case_study_date": "2026-09-15",
+    "question": "At fixed Re, AR and fixed actuation-energy budget E=0.25, how does the modal organization (uniform / stationary 2nd harmonic B1 / mixed B3 / temporal B2) reorganize circulation, strain-rate, wall shear and dissipation?",
+    "controls": ["uniform_E025", "B1_E025", "B3_seed0_E025", "B2_seed5_E025"]
+  },
+  "case": {
+    "energy_budget": 0.25,
+    "uniform_amplitude": 0.5,
+    "b1_amplitude": 0.70710678,
+    "b2_seed": 5,
+    "b3_seed": 0,
+    "seed_provenance_campaign": {
+      "1": {"branch": "B1", "f_2": 0.911, "f_t": 0.013, "A_2": 0.6981, "comment": "B1 pur"},
+      "0": {"branch": "B3", "f_2": 0.520, "f_t": 0.448, "A_2": -0.4992, "comment": "B3 intermediaire (utilise pour B3_E025)"},
+      "5": {"branch": "B2", "f_2": 0.000, "f_t": 0.998, "A_2": -0.0014, "comment": "B2 pur temporel (utilise pour B2_E025)"}
+    }
+  },
+  "controls": {
+    "sin_2pi": {
+      "formula": "U_lid(x) = A2 * sin(2*pi*x)",
+      "A2": 0.68355,
+      "A2_provenance": "A2_PINN_TABLE dans lbm_mrt_pinn_validation.py L544 (controle PINN final reapere, campagne 13 seed 42, branche Fourier). Cohérent avec les seeds B1 de (500,0.25) : seed1 A2=0.6981, seed11 A2=0.6816."
+    },
+    "pinn_mean": {
+      "method": "Moyenne temporelle puis moyenne sur les 15 seeds de la campagne Paper2 au point (500,0.25)",
+      "seed_dir_source": "results/01_ReE_star_map/re500_e0.25/seed_*/model.pt",
+      "fallback": "data/inputs/fourier_Re500.npz (U_mean, controle Paper1 campagne 13 seed 42)",
+      "normalization": "U_mean_normalise par son max (O(1)) comme la serie LBM existante (convention U_ref x U_lid_norm)"
+    }
+  },
+  "lbm": {
+    "solver": "PoF_R_lid_driven_paper/lbm_mrt_validation/lbm_mrt_pinn_validation.py (LBM-MRT D2Q9, numba)",
+    "U_ref": 0.05,
+    "period_forced": 2.0,
+    "N_default": 128,
+    "N_production": 256,
+    "max_iter_default": 1200000,
+    "max_iter_production": 5000000,
+    "tol_default": 1e-8,
+    "tol_production": 1e-9,
+    "stat_cycles": 48,
+    "diagnostics_convention": "champs normalises par U_ref ; nu = 1/Re (non-dimensionnel) ; Phi = nu*(2*S11^2 + 2*S22^2 + 4*S12^2) avec S11=du/dx, S22=dv/dy, S12=0.5*(du/dy+dv/dx), equivalent a (2/Re)[ux^2 + vy^2 + 0.5*(uy+vx)^2] = 2*nu*S:S (standard manuscrit). eps_xx=2nu∫ux², eps_yy=2nu∫vy², eps_xy=nu∫(uy+vx)²"
+  },
+  "paths": {
+    "paper2_root": ".",
+    "paper1_repo": "vendor/paper1",
+    "lbm_solver": "vendor/paper1/lbm_mrt_validation/lbm_mrt_pinn_validation.py",
+    "pinn_module": "vendor/paper1/PINN_Lid_driven_reviewers.py",
+    "seed_models": "vendor/paper1/seed_models",
+    "fourier_series_paper1": "data/inputs/fourier_Re500.npz",
+    "_note": "Chemins RELATIFS a la racine du depot (resolus par le code via ROOT=dirname(dirname(__file__))). Aucun chemin machine-specifique : le depot est autonome et reproductible hors de la machine d'origine."
+  },
+  "outputs": {
+    "lid_series_dir": "data/lid_series",
+    "results_dir": "results",
+    "figures_dir": "figures",
+    "logs_dir": "logs"
+  },
+  "executed_on": "2026-09-15",
+  "execution": {
+    "N": 256,
+    "tol": 1e-9,
+    "max_iter": 5000000,
+    "stat_cycles": 48,
+    "v0_archive": "results/_v0_archive + figures/_v0_archive (Exp. A : uniform(1.0), A2sin(2pix), pinn_mean)",
+    "mesh_check": {"N=128": {"B1": 1.309, "B3": 0.593, "B2": 0.005},
+                   "N=256": {"B1": 1.188, "B3": 0.532, "B2": 0.003}},
+    "iters_reached": {
+      "uniform_E025": [218000, 482000], "B1_E025": [104000, 240000],
+      "B3_seed0_E025": [280000, 548000], "B2_seed5_E025": [148000, 316000]},
+    "residual_reached": {
+      "uniform_E025": 9.37e-10, "B1_E025": 8.20e-10,
+      "B3_seed0_E025": 1.69e-10, "B2_seed5_E025": 8.85e-10},
+    "walltime_s": {
+      "uniform_E025": [226, 1683], "B1_E025": [108, 839],
+      "B3_seed0_E025": [302, 1929], "B2_seed5_E025": [170, 1098]},
+    "stat_iters_used": {"B3_seed0_E025": 12288, "B2_seed5_E025": 12288},
+    "batch": "run_all.py --N 256 --tol 1e-9 --max-iter 5000000 (5552 s total)",
+    "sweep_b1_a2": {
+      "question": "valeur de croisement A2* : eps_B1(A2*)=eps_uniform(0.5) ; marge de l'amplitude de fonctionnement A2=sqrt(0.5)",
+      "reference": "REFERENCE FIXE eps_uniform(U=0.5) pour tous les A2 — PAS une comparaison iso-energetique (voir energy_matched)",
+      "points_N128": [0.45, 0.55, 0.60, 0.64855, 0.68355, 0.70711, 0.75, 0.85, 1.0],
+      "points_N256": [0.60, 0.63024, 0.64855, 0.68355, 0.70711],
+      "crossing_A2_star": {"N=128": 0.63024, "N=256": 0.65767},
+      "crossing_E_star": {"N=128": 0.1986, "N=256": 0.21626},
+      "margin_op_vs_crossing": {"N=128": 1.122, "N=256": 1.075},
+      "eps_over_eps_uniform_N256": [0.802, 0.902, 0.966, 1.096, 1.188],
+      "script": "code/sweep_b1_a2.py", "outputs": ["results/sweep_b1_A2_128.csv",
+                 "results/sweep_b1_A2_256.csv", "figures/fig_sweep_b1.pdf/png"]},
+    "energy_matched": {
+      "question": "a meme E *= A2^2/2, eps_controle/eps_uniform(U0=A2/sqrt(2)=sqrt(E*)) : la 2e harmonique (k=2) ou 1er harmonique (k=1) est-elle dissipativement meilleure, neutre ou pire que l'uniforme au meme budget ?",
+      "comment": "le 'crossing' du sweep_b1_a2 est un artefact de reference FIXE eps_uniform(0.5) ; a energie egale aucun crossing. Narratif paper : branch accessibility != global optimality.",
+      "k2_N256": {"E_star_range": [0.18, 0.25], "n_points": 8, "ratio_range": [1.1487, 1.1882], "monotone": "croissant", "crossing": "NO CROSSING"},
+      "k1_N256": {"E_star_range": [0.18, 0.25], "n_points": 3, "ratio_range": [0.7066, 0.7255], "monotone": "croissant", "crossing": "NO CROSSING (unter 1)"},
+      "k2_N512": {"point": "A2=0.70710678 E*=0.25", "eps_B1": "1.1899e-2", "eps_uniform": "1.1098e-2", "ratio": 1.0721, "converged": "tol 1e-9 (B1 454k it, UN 912k it)"},
+      "k1_N512": {"point": "A2=0.70710678 E*=0.25", "eps_B1": "7.1725e-3", "eps_uniform": "1.1098e-2", "ratio": 0.6463, "converged": "tol 1e-9 (S1em 870k it, resid 9.57e-10, UN reuse 912k it)", "verified": "2026-09-21 run campagne 3 (sweep_energy_matched --N 512 --k 1)"},
+      "mesh_note": "qualitativelyrobust (NO crossing N=128/256/512) ; magnitude grid-dependent (N=128 1.20-1.38, N=256 1.149-1.188, N=512 1.072) ; k=1 N=512 VERIFIE 21/09/2026 : ratio 0.6463 (E*=0.25) vs 0.7255 N256 -> plage grille k1 [0.646, 0.726]",
+      "script": "code/sweep_energy_matched.py",
+      "outputs": ["results/energy_matched_256_k2.csv", "results/energy_matched_256_k1.csv",
+                  "results/energy_matched_512_k2.csv",
+                  "figures/fig_energy_matched_k2_N256.pdf/png", "figures/fig_energy_matched_k1_N256.pdf/png",
+                  "figures/fig_energy_matched_k2_N512.pdf/png"]},
+    "figures": ["fig_lid_controls", "fig_composite_4x3", "fig_quantitative",
+                "fig_tau_w", "fig_summary_numbers.csv"],
+    "note": "mean-field statistics for temporal controls (B3/B2) computed over 48 locked forced cycles (solver stat_cycles patch, run.py provenance)."
+  }
+}
