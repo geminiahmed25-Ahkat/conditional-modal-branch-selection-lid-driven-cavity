@@ -1,6 +1,8 @@
 # Paper 2 — Case study mécanistique à énergie d'actuation fixée (15/09/2026)
 
-**English title** — *Focused fixed-energy comparison of the physical consequences of competing control classes* (lid-driven cavity, Re = 500, AR = 1, E\* = 0.25 fixed).
+**English title** — *Conditional modal branch selection in physics-informed active control of lid-driven cavity flow: identification, reproducibility, and independent numerical verification*.
+
+Repository: https://github.com/geminiahmed25-Ahkat/conditional-modal-branch-selection-lid-driven-cavity
 
 | Document | Contents |
 |---|---|

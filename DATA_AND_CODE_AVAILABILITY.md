@@ -2,9 +2,12 @@
 
 This repository is the reference implementation and data release for:
 
-> **Paper 2 — Focused fixed-energy comparison of the physical consequences of
-> competing control classes** (lid-driven cavity, Re = 500, AR = 1,
-> actuation-energy budget E* = 0.25 fixed for all four controls).
+> **Conditional modal branch selection in physics-informed active control of
+> lid-driven cavity flow: identification, reproducibility, and independent
+> numerical verification** (Re = 500, AR = 1, actuation-energy budget
+> E\* = 0.25 held identical across the four compared control classes).
+
+Repository: <https://github.com/geminiahmed25-Ahkat/conditional-modal-branch-selection-lid-driven-cavity>
 
 ## What is included here
 
