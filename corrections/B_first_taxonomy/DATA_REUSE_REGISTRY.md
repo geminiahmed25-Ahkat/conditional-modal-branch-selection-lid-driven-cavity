@@ -36,6 +36,12 @@ an independent observation in two different analyses.
 3. Recomputing C1/C2 branch labels with the corrected four-class rule gives
    `P(B_first)` = 0.000 (C1) and 0.571 (C2), consistent with Paper 2's
    `P(B_first) = 0` at `lambda_var = 1` and its rise at `lambda_var = 0`.
+   The C2 summary row (n = 49, `P(B1)` = 0.265, `P(B2)` = 0.122,
+   `P(B_first)` = 0.571) is computed from the complete frozen run list
+   `inputs/runs_campaign2.csv`; the frozen per-run audit
+   `inputs/global_reclassification.csv` currently enumerates 47/49 C2 runs
+   (`lambda_var = 10`, seeds 5-6 are pending there). The `B_first` count (28)
+   is identical under both coverages.
 
 ## Data-integrity notes (reference campaign)
 

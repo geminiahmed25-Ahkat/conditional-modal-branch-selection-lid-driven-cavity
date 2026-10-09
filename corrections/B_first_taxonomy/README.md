@@ -66,6 +66,10 @@ at `lambda_var = 0.25` and disappears at `lambda_var = 0.5`. See
 
 ## Reproduce
 
+All inputs are vendored under `inputs/` and all paths resolve relative to the
+scripts, so the correction reproduces from a fresh clone (set `P2CORR_HOME` to
+redirect inputs/results/figures elsewhere).
+
 ```powershell
 # Python (numpy / pandas / matplotlib):
 py -3.11 01_recompute_taxonomy.py   # regenerates results/corrected_*.csv
@@ -73,3 +77,9 @@ py -3.11 02_make_figures.py         # regenerates figures/fig03, fig04, fig07
 # LaTeX (the manuscript compiles with pdflatex):
 cd manuscript; pdflatex manuscript.tex; pdflatex manuscript.tex
 ```
+
+Note: the reuse-registry `C2` summary row in `corrected_global_summary.csv` is
+derived from the complete 49-run campaign list (`inputs/runs_campaign2.csv`),
+because the per-run audit (`inputs/global_reclassification.csv`) covers 47/49 C2
+runs (`lambda_var = 10`, seeds 5-6 pending); the `B_first` count (28/49) is the
+same under both coverages.

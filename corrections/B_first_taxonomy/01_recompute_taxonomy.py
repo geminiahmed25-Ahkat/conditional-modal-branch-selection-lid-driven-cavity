@@ -16,7 +16,14 @@ where
 Normalized Shannon entropy over the four classes:
     H_N = -(1/ln 4) sum_k P_k ln P_k   (0 = deterministic, 1 = uniform over 4 classes)
 
-Outputs (written to 02_results/):
+Inputs (this folder ./inputs/):
+    global_reclassification.csv   frozen per-run audit (f1/f2/ft per source run)
+    loss_ablation_results.csv     frozen 8-run loss ablation (No Lvar, etc.)
+    mode_analysis.csv             frozen main-grid modal analysis (seed study)
+    runs_campaign2.csv            frozen 49-run Paper 3 campaign2 list (C2);
+                                  only for the reuse-registry C2 summary row
+
+Outputs (written to results/):
     corrected_taxonomy_all_runs.csv
     corrected_maingrid_summary.csv
     corrected_lambda_table.csv
@@ -26,18 +33,24 @@ Outputs (written to 02_results/):
     corrected_seed_study.csv
     corrected_energy_sweep.csv
     corrected_global_summary.csv
+
+Self-contained: all paths resolve relative to this script, so the correction
+reproduces from a fresh clone without editing. Set P2CORR_HOME to redirect
+inputs/test/outputs elsewhere (e.g. to regenerate a full package copy).
 """
 import os
 import numpy as np
 import pandas as pd
 
-TARGET = r"C:\Users\user\Documents\travail pc taki_final\Default Project\papier 2 date_14_09_2026\Paper2_branch_selection\Paper2_clean_corrected"
-OUT = os.path.join(TARGET, "02_results")
+BASE = os.getenv("P2CORR_HOME") or os.path.dirname(os.path.abspath(__file__))
+INPUTS = os.path.join(BASE, "inputs")
+OUT = os.path.join(BASE, "results")
 os.makedirs(OUT, exist_ok=True)
 
-AUDIT = r"C:\Users\user\Documents\travail pc taki_final\Default Project\Paper3_prep\audit_paper2\global_reclassification.csv"
-ABLATION = r"C:\Users\user\Documents\travail pc taki_final\Default Project\PoF_R_lid_driven_paper\results_reviewers\02_loss_ablation\loss_ablation_results.csv"
-MAINGRID_MODE = r"C:\Users\user\Documents\travail pc taki_final\Default Project\papier 2 date_14_09_2026\Paper2_branch_selection\results\01_ReE_star_map\mode_analysis.csv"
+AUDIT = os.path.join(INPUTS, "global_reclassification.csv")
+ABLATION = os.path.join(INPUTS, "loss_ablation_results.csv")
+MAINGRID_MODE = os.path.join(INPUTS, "mode_analysis.csv")
+C2_RUNS = os.path.join(INPUTS, "runs_campaign2.csv")
 
 CLASSES = ["B1", "B2", "B_first", "B3"]
 
@@ -189,6 +202,16 @@ print(es_tab.to_string(index=False))
 rows = []
 for src, sub in g.groupby("source"):
     s = summarize(sub)
+    if src == "C2":
+        # C2 is Paper 3 reuse (registry only, not a Paper 2 result). The complete
+        # 49-run campaign list is kept in runs_campaign2.csv; the per-run audit
+        # global_reclassification.csv currently enumerates 47/49 C2 runs (the
+        # lambda_var = 10 seeds 5-6 are missing there). Summary from the complete
+        # list so the registry count (49) is preserved. f1 = 1 - f2 - ft.
+        cr = pd.read_csv(C2_RUNS)
+        cr["f1"] = 1.0 - cr.f_2 - cr.f_t
+        cr["corr_label"] = [classify(a, b, c) for a, b, c in zip(cr.f1, cr.f_2, cr.f_t)]
+        s = summarize(cr)
     rows.append({"source": src, **s})
 glob = pd.DataFrame(rows)
 glob.to_csv(os.path.join(OUT, "corrected_global_summary.csv"), index=False)
@@ -200,4 +223,9 @@ print("\n=== C1 / C2 (Paper 3 reuse) ===")
 for src in ["C1", "C2"]:
     sub = g[g.source == src]
     s = summarize(sub)
+    if src == "C2":
+        cr = pd.read_csv(C2_RUNS)
+        cr["f1"] = 1.0 - cr.f_2 - cr.f_t
+        cr["corr_label"] = [classify(a, b, c) for a, b, c in zip(cr.f1, cr.f_2, cr.f_t)]
+        s = summarize(cr)
     print(src, s)

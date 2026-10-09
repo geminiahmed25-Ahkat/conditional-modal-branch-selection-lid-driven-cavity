@@ -143,7 +143,7 @@ The `No L_var` "modal-class shift" is now identified as `B_1 -> B_first`, not
 | P2 lambda_var | 90 | 0.289 | 0.311 | 0.222 | 0.178 |
 | P2 exp09 | 54 | 0.593 | 0.167 | 0.222 | 0.019 |
 | C1 (Paper 3) | 50 | 0.620 | 0.320 | 0.000 | 0.060 |
-| C2 (Paper 3) | 49 | 0.245 | 0.143 | 0.571 | 0.041 |
+| C2 (Paper 3) | 49 | 0.265 | 0.122 | 0.571 | 0.041 |
 
 (C1/C2 are shown for the reuse registry only and are **not** Paper 2 results.)
 

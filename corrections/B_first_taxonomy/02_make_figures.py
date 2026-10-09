@@ -16,8 +16,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-TARGET = r"C:\Users\user\Documents\travail pc taki_final\Default Project\papier 2 date_14_09_2026\Paper2_branch_selection\Paper2_clean_corrected"
-OUT = os.path.join(TARGET, "03_figures")
+BASE = os.getenv("P2CORR_HOME") or os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.join(BASE, "figures")
 os.makedirs(OUT, exist_ok=True)
 DPI = 300
 plt.rcParams.update({"font.size": 10, "axes.titlesize": 11, "axes.labelsize": 10,
