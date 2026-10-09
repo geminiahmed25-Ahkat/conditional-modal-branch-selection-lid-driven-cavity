@@ -1,0 +1,363 @@
+% =====================================================================
+% SUPPLEMENTARY ONLINE MATERIAL
+% Conditional modal branch selection in physics-informed active control
+% of lid-driven cavity flow: identification, reproducibility, and
+% independent numerical verification
+%
+% This document is intended to be uploaded separately in the journal
+% submission system with the file type "Supplementary Online Material".
+% It complements the main manuscript and is organized in Sections S1-S11.
+% =====================================================================
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage[margin=1in]{geometry}
+
+\title{\textbf{Supplementary Online Material} for: Conditional modal branch
+selection in physics-informed active control of lid-driven cavity flow}
+\author{Beniaiche Ahmed, Larabi Abderrahim, and Belkadi Mbarek\\
+Ecole Militaire Polytechnique, Algiers, Algeria}
+\date{}
+
+\begin{document}
+\maketitle
+
+\vspace{0.5em}
+This document provides the implementation details, complete datasets, and
+additional analyses supporting the main manuscript. Section numbers S1--S11
+correspond to the references ``Supplementary Sec.~S\ldots'' used in the text.
+
+\section{S1. PINN architecture and training details}
+\label{sec:S1}
+
+The parametric network represents the flow-control pair for the full Reynolds
+interval $[100,1000]$ through inputs $(x,y,t,\widetilde{Re})$, with
+$\widetilde{Re}=(Re-550)/450\in[-1,1]$.
+
+\begin{itemize}
+\item \textbf{Flow subnetwork}: 6 hidden layers $\times$ 64 neurons, $\tanh$
+  activation, 21\,379 trainable parameters; outputs $(u,v,p)$.
+\item \textbf{Control subnetwork}: 4 hidden layers $\times$ 32 neurons,
+  3\,614 trainable parameters; outputs the coefficients $\{a_{mn}\}$.
+\item \textbf{Precision}: all arithmetic in double precision; residuals by
+  automatic differentiation.
+\item \textbf{Training}: 300-epoch pre-training (flow only, control frozen at
+  zero), then 3\,000-epoch joint phase with Adam
+  ($\eta_0=8\times10^{-4}$, decay factor 0.995 per 100 epochs).
+  Collocation points: $N_{\mathrm{phys}}=4\,000$ interior points resampled
+  uniformly every epoch; $N_{\mathrm{probe}}=20$ for the Reynolds-separation
+  term.
+\item \textbf{Loss weights}:
+  $\lambda_{\mathrm{PDE}}=1$, $\lambda_{\mathrm{BC}}=15$,
+  $\lambda_{\mathrm{diss}}=0.05$, $\lambda_{\mathrm{ctrl}}=200$,
+  $\lambda_{\mathrm{var}}=1$, $\lambda_{Re}=2$.
+\end{itemize}
+
+\section{S2. Modal-energy quadrature conventions}
+\label{sec:S2}
+
+For the lid-expansion
+$U_{\mathrm{lid}}(x,t,Re)=\sum_m\sum_n a_{mn}\sin(m\pi x/L_x)\cos(n\pi t)$,
+the modal energy accounting uses $\langle\cos^2(0)\rangle=1$ and
+$\langle\cos^2(n\pi t)\rangle=\tfrac12$ for $n\ge1$:
+\[
+\mathcal{E}_{m0}=\tfrac12 a_{m0}^2,\qquad
+\mathcal{E}_{mn}=\tfrac14 a_{mn}^2\;(n\ge1).
+\]
+The realized actuation energy is
+$E_r=\langle U_{\mathrm{lid}}^2\rangle_{s,t}$, with
+$s=x/L_x$, and the normalized modal fractions
+$f_{mn}=\mathcal{E}_{mn}/\sum\mathcal{E}_{ij}$ sum to unity. The stationary
+second-harmonic fraction is $f_2\equiv f_{20}$ and the total
+time-dependent fraction is $f_t=\sum_{m}\sum_{n\ge1}f_{mn}$.
+
+\section{S3. Reference $(Re,E^*)$ campaign -- realization-level data}
+\label{sec:S3}
+
+\begin{table}[h]
+\centering\small
+\caption{Pooled and per-condition statistics of the 185-realization campaign
+(30 cells; oversampled cells: $Re=1000,E^*=1$ ($n=20$),
+$Re=500,E^*=0.25$ ($n=15$), $Re=700,E^*=2$ ($n=15$)).}
+\label{tab:S3}
+\begin{tabular}{lcccc}
+\toprule
+Quantity & $B_1$ & $B_2$ & $B_{\mathrm{first}}$ & $B_3$\\
+\midrule
+Pooled frequency (frozen labels) & 42.2\% & 43.8\% & 0.0\% & 14.1\%\\
+Pooled frequency (threshold re-classification) & 42.2\% & 43.8\% & 0.0\% & 14.1\%\\
+Mean per condition & 42.1\% & 46.7\% & 0.0\% & 11.3\%\\
+Pooled excluding oversampled cells ($N=135$) & 42.2\% & 48.1\% & 0.0\% & 9.6\%\\
+Discrepancies frozen vs.\ threshold ($N=185$) & \multicolumn{4}{c}{0 / 185}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The threshold classification rule is: $B_{\mathrm{first}}$ if $f_1>0.5$;
+$B_1$ if $f_2>2f_t$ and $f_2>0.5$;
+$B_2$ if $f_t>2f_2$ and $f_t>0.5$; otherwise $B_3$. No realization of the
+185-run reference campaign at $\lambda_{\mathrm{var}}=1$ satisfies $f_1>0.5$, so
+$B_{\mathrm{first}}$ is empty there. The frozen labels and the
+threshold-based re-classification coincide for all 185 realizations (0/185).
+The realization-level file (Supplementary Table~S1 in the submission system)
+lists, for each realization: $(Re, E^*)$, seed, $f_2$, $f_t$, the dominant
+coefficients, total loss, and frozen branch label.
+
+\section{S4. Variance-regularization campaign and Wilson intervals}
+\label{sec:S4}
+
+Six values of $\lambda_{\mathrm{var}}\in\{0,0.25,0.5,1,2,5\}$ at three
+operating points, $N_s=5$ seeds each (90 runs). Frequencies are reported in
+Table~3 of the main text. Finite-sample 95\% Wilson-score confidence
+intervals use
+\[
+p\pm\frac{z}{\sqrt{N_s}}\sqrt{\frac{\hat p(1-\hat p)}{N_s}+\frac{z^2}{4N_s^2}}
+\,\Big/\left(1+\frac{z^2}{N_s}\right),\qquad z=1.96.
+\]
+For $N_s=5$ and $\hat p=0$, $0.2$, $0.4$, $0.6$, $1.0$ the half-widths are
+$0.31$, $0.43$, $0.47$, $0.43$, $0.31$, respectively. All realizations are
+classified with the four-class rule of Sec.~S3. At $\lambda_{\mathrm{var}}=0$ every
+one of the 15 realizations is $B_{\mathrm{first}}$ (first harmonic,
+$f_1>0.5$); these were grouped with $B_3$ under the original three-class scheme.
+The corrected per-cell frequencies and entropies (normalised by $\ln4$) are those
+of Table~3 of the main text.
+
+\section{S5. Energy sweep and seed multiplicity}
+\label{sec:S5}
+
+\textbf{Energy sweep} at $Re=500$ ($E^*\in\{0.01,0.05,0.1,0.25,0.5,1,2\}$):
+
+\begin{table}[h]
+\centering\small
+\caption{Energy sweep at $Re=500$.}
+\label{tab:S5a}
+\begin{tabular}{lcccccccc}
+\toprule
+$E^*$ & 0.01 & 0.05 & 0.1 & 0.25 & 0.5 & 1 & 2\\
+\midrule
+$f_2$ (\%) & $\sim94$ & $\sim93$ & 92.2 & 92.2 & -- & -- & 74.0\\
+$f_t$ (\%) & $\sim0.5$ & $\sim0.7$ & 1.1 & 1.3 & -- & -- & 21.8\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In every energy-sweep realization the first-harmonic fraction remains small
+($f_1\le8\%$), so the $B_{\mathrm{first}}$ branch never appears; the sweep stays
+within the $B_1$ branch and the erosion of second-harmonic purity at high energy is
+a redistribution toward time-dependent modes rather than toward the fundamental.
+
+\textbf{Seed multiplicity} at $Re=500$, $E^*=0.25$, 10 seeds: 4 $B_1$,
+4 $B_2$, 2 $B_3$ (0 $B_{\mathrm{first}}$, $f_1<0.02$ for all seeds); total losses
+in $[1.371,1.394]$ (relative spread 1.7\%).
+
+\section{S6. Capacity and truncation experiments}
+\label{sec:S6}
+
+Capacity variants at $Re=500$, $E^*=0.25$: $4\times32$ (small),
+$6\times64$ (reference), $8\times128$ (large) give
+$f_2\in[89.5\%,92.2\%]$. Control truncations
+$(N_x,N_t)\in\{(4,3),(6,1),(6,3),(6,5),(8,5),(8,9)\}$ give
+$f_2\in[87.3\%,92.3\%]$ with $A_2\in[0.668,0.684]$; see Table~6 of the main
+text.
+
+\section{S7. Spectral bases and aspect ratio}
+\label{sec:S7}
+
+Fourier basis: sine in space (enforces corner compatibility) and cosine in
+time ($n=0$ = stationary). Modified-Chebyshev basis: same structure with
+Chebyshev polynomials of the first kind $T_m$ on the lid interval, normalized
+to the same energy budget. Aspect-ratio cells $AR\in\{0.5,1,2\}$ at
+$Re=500$, $E^*=0.25$: $f_2=69.9\%$, $92.2\%$, $91.2\%$ (see Table~7 of the
+main text).
+
+\section{S8. MRT-LBM solver and grid-convergence index (GCI)}
+\label{sec:S8}
+
+\textbf{Solver.} D2Q9 lattice with the diagonal relaxation vector
+$\mathbf{S}=\mathrm{diag}(0,1.4,1.4,0,1.2,0,1.2,\omega,\omega)$,
+$\omega=1/\tau$, $\tau=3\nu_{\mathrm{LBM}}+0.5$,
+$\nu_{\mathrm{LBM}}=U_{\mathrm{ref}}N/Re$ with $U_{\mathrm{ref}}=0.05$.
+Lid forcing through a velocity boundary condition; boundary populations via
+the Zou--He scheme. Parallelism via Numba \texttt{prange} over lattice rows.
+
+\textbf{Benchmark.} Centerline velocity errors against Ghia et al.\ at
+$N=256$: $L_2(u)=0.00506$, $L_\infty(u)=0.01283$ ($Re=100$);
+$L_2(u)=0.01411$, $L_\infty(u)=0.03003$ ($Re=1000$); corresponding
+$v$-component errors $0.00675/0.01136$ and $0.01321/0.02125$.
+
+\textbf{GCI.} Three-grid study of the $A_2\sin(2\pi x)$ control at $Re=500$,
+$N\in\{128,256,512\}$:
+\[
+\varepsilon_{128}=0.0093500,\quad
+\varepsilon_{256}=0.0104070,\quad
+\varepsilon_{512}=0.0109658 .
+\]
+Observed order $p_{\mathrm{obs}}=0.9196$ (from
+$p=\ln|(\varepsilon_{256}-\varepsilon_{128})/(\varepsilon_{512}-\varepsilon_{256})|/\ln 2$),
+Richardson extrapolation
+$\varepsilon_{\infty}=0.01159$. The GCI (formula S8.4) uses the safety factor
+$F_s=1.25$ and refinement ratio $r=2$:
+\[
+\mathrm{GCI}_{j}=F_s\,\frac{|\varepsilon_{j+1}-\varepsilon_{j}|}{(r^{p}-1)\,\varepsilon_{j}},
+\quad\Rightarrow\quad
+\mathrm{GCI}_{512}=7.15\%,\quad \mathrm{GCI}_{256}=14.25\% .
+\]
+Uniform-to-extrapolated reduction:
+$0.01159/0.0442824=73.8\%$ (vs.\ $76.5\%$ measured at $N=256$).
+
+\section{S9. Symbolic regression: configuration and LOCO scores}
+\label{sec:S9}
+
+PySR over binary operators $\{+,-,\times,/\}$ and unary
+$\{\sin,\cos,\exp,\mathrm{square}\}$, 20 populations, 100 iterations each,
+Pareto selection on complexity--accuracy trade-off. Best expression:
+$U_{\mathrm{SR}}\approx a[b+\cos(\omega_{\mathrm{SR}}x-\phi)]^2
+(c_0+c_1x+c_2t+c_3\,Re)+c_4$, $\omega_{\mathrm{SR}}\approx3.42$.
+Leave-one-Reynolds-condition-out $R^2$ over
+$Re\in\{100,300,400,500,600,700,800,900,1000\}$: minimum $0.9326$ ($Re=900$),
+maximum $0.9908$ ($Re=500$); all nine values above $0.93$.
+
+\section{S10. Reproducibility double runs and multi-seed audit}
+\label{sec:S10}
+
+\textbf{Double runs A/B} (idempotent, same seeds/hyperparameters, base $6\times5$,
+$E^*=0.25$, final code) at $Re=500$:
+
+\begin{table}[h]
+\centering\small
+\caption{Reproducibility double-run results (A/B/original).}
+\label{tab:S10a}
+\begin{tabular}{ccrrrrrl}
+\toprule
+seed & run & $E$ & $f_2$ & $f_t$ & $A_{10}$ & $A_{20}$ & branch\\
+\midrule
+4 & A & 0.2514 & 0.5957 & 0.3693 & 0.0376 & $-0.5472$ & $B_3$\\
+4 & B & 0.2512 & 0.6080 & 0.3575 & 0.0394 & $-0.5527$ & $B_3$\\
+4 & orig & 0.2495 & 0.5215 & 0.4501 & 0.0364 & $-0.5101$ & $B_3$\\
+7 & A & 0.2508 & 0.9271 & 0.0083 & $-0.0604$ & 0.6819 & $B_1$\\
+7 & B & 0.2508 & 0.9271 & 0.0083 & $-0.0604$ & 0.6819 & $B_1$\\
+7 & orig & 0.2498 & 0.9131 & 0.0162 & $-0.0681$ & 0.6754 & $B_1$\\
+8 & A & 0.2507 & 0.0357 & 0.9609 & $-0.0109$ & 0.1339 & $B_2$\\
+8 & B & 0.2507 & 0.0357 & 0.9609 & $-0.0109$ & 0.1339 & $B_2$\\
+8 & orig & 0.2503 & 0.0133 & 0.9841 & $-0.0158$ & 0.0817 & $B_2$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Runs A and B are bit-identical to the last decimal for seeds 7 and 8, and
+quasi-identical for seed 4 (same class $B_3$). All three coincide with the
+original realizations re-analyzed with the final code.
+
+\textbf{Multi-seed audit} (99 realizations, final code, 18 configurations):
+
+\begin{table}[h]
+\centering\footnotesize
+\caption{Audit summary per configuration: mean $f_2$, mean $f_t$, mean $A_2$
+(in \%), and branch counts.}
+\label{tab:S10b}
+\begin{tabular}{lrrrrl}
+\toprule
+label & $n$ & $\bar f_2$ & $\bar f_t$ & $\bar A_2$ & $B_1/B_2/B_3$\\
+\midrule
+ar\_rect\_2 & 5 & 90.8 & 1.2 & 0.687 & 5/0/0\\
+ar\_rect\_half & 5 & 15.3 & 83.8 & 0.187 & 1/4/0\\
+ar\_square & 5 & 73.0 & 20.1 & 0.572 & 4/1/0\\
+bas\_cheb\_re100 & 5 & 0.5 & 99.2 & $-0.030$ & 0/5/0\\
+bas\_cheb\_re1000 & 5 & 1.2 & 98.4 & $-0.047$ & 0/5/0\\
+bas\_cheb\_re500 & 5 & 2.1 & 97.6 & $-0.085$ & 0/5/0\\
+bas\_fourier\_re100 & 5 & 32.6 & 64.7 & 0.313 & 1/3/1\\
+bas\_fourier\_re1000 & 5 & 73.5 & 21.3 & 0.610 & 3/0/2\\
+bas\_fourier\_re500 & 5 & 73.0 & 20.1 & 0.572 & 4/1/0\\
+cap\_baseline & 8 & 64.0 & 30.5 & 0.402 & 5/2/1\\
+cap\_large & 8 & 89.1 & 3.6 & 0.676 & 8/0/0\\
+cap\_small & 8 & 92.2 & 1.3 & 0.694 & 8/0/0\\
+mc\_4x3 & 5 & 54.4 & 39.4 & 0.436 & 3/2/0\\
+mc\_6x1 & 5 & 91.1 & 0.0 & 0.683 & 5/0/0\\
+mc\_6x3 & 5 & 75.1 & 16.1 & 0.485 & 4/1/0\\
+mc\_6x5 & 5 & 73.1 & 20.1 & 0.572 & 4/1/0\\
+mc\_8x5 & 5 & 59.1 & 34.9 & 0.485 & 3/2/0\\
+mc\_8x9 & 5 & 47.4 & 47.7 & 0.408 & 2/2/1\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Every audited realization reproduces the frozen branch label of the original
+run; combined with the 0/185 discrepancies of the threshold re-classification
+(Sec.~S3), the branch taxonomy is internally consistent.
+
+\section{S11. Energy-matched comparison, trajectory tests, and B2 windows}
+\label{sec:S11}
+
+\textbf{Energy-matched LBM} at $E^*=0.25$, $Re=500$ (integrated dissipation
+$\varepsilon$ and ratio to the uniform reference):
+
+\begin{table}[h]
+\centering\small
+\caption{Iso-energetic dissipation ratios at $N=256$ and $N=512$.}
+\label{tab:S11a}
+\begin{tabular}{lcccc}
+\toprule
+Grid & $\varepsilon_{\mathrm{unif}}$ & $\varepsilon_{k=1}$ & $\varepsilon_{k=2}$ & ratios $k1/k2$\\
+\midrule
+$N=256$ & $9.4980\times10^{-3}$ & $6.8912\times10^{-3}$ & $1.1285\times10^{-2}$ & $0.7255$ / $1.188$\\
+$N=512$ & $1.10981\times10^{-2}$ & $7.1725\times10^{-3}$ & $1.18987\times10^{-2}$ & $0.6463$ / $1.0721$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The energy-matched ranking $k=1<\mathrm{uniform}<k=2$ is unchanged across
+resolutions; the $k=1$ ratio range is $[0.646,0.726]$ and the
+$k=2$ ($B_1$) ratio range is $[1.072,1.188]$.
+
+\textbf{Exp~D trajectory tests} ($Re=500$, $E^*=0.25$, probe spacing 50 epochs;
+seeds 4/7/8 $\leftrightarrow$ classes $B_3/B_1/B_2$). Control-energy
+autocorrelation $R_E(\Delta)$, control-cycle displacements $D_1,D_4$, and
+modal displacements $\Delta f$:
+
+\begin{table}[h]
+\centering\small
+\caption{Exp~D trajectory diagnostics.}
+\label{tab:S11b}
+\begin{tabular}{lcccccc}
+\toprule
+seed & $R_E(1)$ & $R_E(2)$ & $R_E(4)$ & $D_1$ & $D_4/D_1$ & $\Delta f(4)$ steady\\
+\midrule
+4 & $+0.245$ & $+0.167$ & $+0.364$ & 0.0744 & 2.92 & 0.0500\\
+7 & $-0.446$ & $+0.488$ & $+0.372$ & 0.0091 & 0.92 & 0.0011\\
+8 & $+0.552$ & $+0.821$ & $+0.643$ & 0.4178 & 2.29 & 0.0010\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The four-epoch spectral peak of the raw per-epoch loss ($f\approx0.25$;
+power up to $\sim55\times$ the spectral median for seed 4) does not propagate
+to energy, control, or modal fractions: no period-4 cycle is detected in the
+control path, and branch labels stay stable across transients (seed 7:
+case A; seed 8: finite relocation transient within one class, case B; seed 4:
+slow persistent drift, case C). With $n=60$ trajectory points
+($n=30$ stationary), the autocorrelation standard error is
+$\approx0.13$--$0.18$.
+
+\textbf{B2 long-window quasi-stationarity} ($Re=500$, $E^*=0.25$, $N=256$;
+LBM run of 640\,000 iterations, actuation period 256):
+
+\begin{table}[h]
+\centering\small
+\caption{B2 kinetic-energy fluctuation ratio over $T$ and $2T$ windows.}
+\label{tab:S11c}
+\begin{tabular}{cccc}
+\toprule
+window & cycles & $R_K=K_{\mathrm{fluct}}/K_{\mathrm{mean}}$ & $|\Delta R_K|/R_K(2T)$\\
+\midrule
+$T$ & 128 & $14.95941409258121$ & --\\
+$2T$ & 256 & $14.959414094980596$ & $1.60\times10^{-10}$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+with a 15\% persistence threshold, the verdict is \textbf{PERSISTANT}: the $B_2$
+flow is statistically stationary in the mean-dissipation sense while being
+strongly time-dependent at the actuation frequency ($R_K\simeq15$).
+
+\end{document}

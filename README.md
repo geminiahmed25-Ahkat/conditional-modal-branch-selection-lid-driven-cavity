@@ -19,6 +19,15 @@ This repository is **self-contained and machine-independent**: all paths in
 companion Paper 1 are vendored in `vendor/paper1/`. A reviewer can reproduce the
 study without access to the authors' machine (see `REPRODUCE.md`).
 
+> **Correction (four-class branch taxonomy).** A correction to the branch
+> classification is provided in [`corrections/B_first_taxonomy/`](corrections/B_first_taxonomy/).
+> The 185-run reference campaign (`lambda_var = 1`) is unchanged; the
+> `lambda_var = 0` and `No L_var` runs are dominated by the stationary first
+> harmonic `sin(πx/Lx)` (`B_first`), not by a "mixed"/temporal branch. The
+> corrected figures (`fig03`, `fig04`, `fig07`) and manuscript inside that folder
+> supersede the repository-root copies. See the folder's `README.md` and
+> `CORRECTION_REPORT.md`.
+
 ## Objectif
 
 Étude ciblée **Re = 500, AR = 1, E\* = 0.25 FIXÉ pour tous les contrôles** pour
@@ -71,6 +80,8 @@ paper2_case_study_repo/
 ├── results/                 # scalars_*.json, case_study_summary.csv, FIELDS_NOT_IN_REPO.csv
 │                            #   (champs .npz de 148 Mo exclus : SHA256 dans FIELDS_NOT_IN_REPO.csv)
 ├── figures/                 # figs paper-grade (pdf/png)
+├── corrections/             # corrected four-class taxonomy (B_first): figures,
+│                            #   manuscript, tables, report (see corrections/B_first_taxonomy/)
 ├── logs/                    # convergence, production_n256.log, checksums
 └── fig01..fig14.pdf/png     # figures manuscript (labels EN)
 ```
