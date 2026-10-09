@@ -1,9 +1,10 @@
 # Correction — four-class branch taxonomy (`B_first`)
 
-This folder contains the corrected version of the Paper 2 analysis. It **supersedes**
-the following files at the repository root (kept unchanged for traceability):
+This folder documents the correction of the following repository-root files. The
+root copies have been updated in place; this folder retains the provenance, the
+derivations, and the full correction report.
 
-| Superseded file (root) | Corrected file (here) |
+| Corrected file (root) | Corrected file (here) |
 |---|---|
 | `fig03_lambda_branch_probabilities.{png,pdf}` | `figures/fig03_lambda_branch_probabilities.{png,pdf}` |
 | `fig04_lambda_entropy.{png,pdf}` | `figures/fig04_lambda_entropy.{png,pdf}` |
@@ -45,8 +46,11 @@ The 185-run reference campaign (`lambda_var = 1`) contains **no** `B_first`
 `B_3` 14.1 %; 0/185 discrepancies) are unchanged, and all main conclusions hold.
 The correction changes the interpretation of the `lambda_var` sweep and the loss
 ablation: at `lambda_var = 0` the model deterministically selects `B_first`
-(`sin(πx)`), not a "mixed" control; any positive `lambda_var` suppresses
-`B_first`. See `CORRECTION_REPORT.md` for every corrected number.
+(`sin(πx)`), not a "mixed" control. Suppression of `B_first` by a positive
+`lambda_var` is **operating-point dependent**: complete at `lambda_var = 0.25`
+for `(Re,E*) = (500,0.25)` and `(1000,1)`, while at `(700,2)` the branch persists
+at `lambda_var = 0.25` and disappears at `lambda_var = 0.5`. See
+`CORRECTION_REPORT.md` for every corrected number.
 
 ## Contents
 

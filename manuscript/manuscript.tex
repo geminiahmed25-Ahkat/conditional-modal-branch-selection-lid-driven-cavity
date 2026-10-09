@@ -29,12 +29,15 @@ Fourier actuation basis. Rather than assuming that optimization convergence
 identifies a unique optimal control, we quantify the conditional selection,
 reproducibility, and numerical realizability of low-dimensional control branches.
 Over Reynolds numbers \(100\le Re\le 1000\) and prescribed dimensionless actuation
-energies \(E^*\), independent trainings reveal three empirical classes: \(B_1\)
-(stationary second spatial harmonic), \(B_2\) (time-dependent actuation), and
-\(B_3\) (mixed). Their frequencies depend on \(Re\), \(E^*\), initialization, loss
+energies \(E^*\), independent trainings reveal four empirical classes: \(B_1\)
+(stationary second spatial harmonic), \(B_2\) (time-dependent actuation),
+\(B_{\mathrm{first}}\) (stationary first harmonic), and \(B_3\) (mixed). Their
+frequencies depend on \(Re\), \(E^*\), initialization, loss
 weights, and control representation. Changing the variance-regularization weight
-redistributes branch accessibility without altering the Navier--Stokes problem,
-and seed experiments at fixed \((Re,E^*)\) yield distinct converged controls with
+redistributes branch accessibility without altering the Navier--Stokes problem;
+removing it selects the stationary first-harmonic branch \(B_{\mathrm{first}}\)\,
+whereas the second harmonic prevails at the reference weight. Seed experiments at
+fixed \((Re,E^*)\) yield distinct converged controls with
 similar losses. Selected controls are transferred without retraining to an
 independent multiple-relaxation-time lattice-Boltzmann (MRT-LBM) solver, validated
 against Ghia et al.; the second-harmonic control reduces integrated viscous
@@ -46,7 +49,8 @@ budget (dissipation ratio in \([1.072,1.188]\)), while the first harmonic is
 consistently less dissipative (ratio in \([0.646,0.726]\)), ranking first-harmonic
 $<$ uniform $<$ second-harmonic at both resolutions. Reproducibility experiments
 yield bit-identical double runs, and multi-seed audits confirm the branch taxonomy
-(0/185 reclassification disagreements); the results support conditional branch
+(0/185 reclassification disagreements in the reference campaign at
+\(\lambda_{\mathrm{var}}=1\)); the results support conditional branch
 accessibility and reproducibility but refute uniqueness or global optimality.
 
 \medskip\noindent\textbf{Keywords:} physics-informed neural networks; active flow
@@ -71,7 +75,8 @@ PDE  & Partial differential equation\\
 D2Q9 & Two-dimensional nine-velocity lattice\\
 LOCO & Leave-one-Reynolds-condition-out\\
 SR   & Symbolic regression\\
-\(B_1,B_2,B_3\) & Empirical branch classes\\
+\(B_1,B_2,B_{\mathrm{first}},B_3\) & Empirical branch classes\\
+\(f_1\) & Stationary first-harmonic control-energy fraction\\
 \(f_2\) & Stationary second-harmonic control-energy fraction\\
 \(f_t\) & Explicitly time-dependent control-energy fraction\\
 \(H_N\) & Normalized branch-selection entropy\\
@@ -431,24 +436,36 @@ Supplementary Sec.~S1.
 
 \subsection{Branch classification and reproducibility protocol}
 
-Converged neural realizations are classified into three empirical branch classes
+Converged neural realizations are classified into four empirical branch classes
 according to their modal signature computed from
-Eqs.~\eqref{eq:modal_energy}--\eqref{eq:modal_fraction}:
+Eqs.~\eqref{eq:modal_energy}--\eqref{eq:modal_fraction}. Let
+\(f_1\equiv f_{10}\) denote the stationary first-harmonic (fundamental) fraction,
+\(f_2\equiv f_{20}\) the stationary second-harmonic fraction, and
+\(f_t=\sum_m\sum_{n\ge1}f_{mn}\) the total explicitly time-dependent fraction:
 \begin{itemize}
-\item \textbf{Branch \(B_1\) --- Stationary second-mode dominated:} \(f_2>0.70\).
+\item \textbf{Branch \(B_{\mathrm{first}}\) --- Stationary first-harmonic dominated:}
+\(f_1>0.5\). Physical harmonic \((m,n)=(1,0)\).
+\item \textbf{Branch \(B_1\) --- Stationary second-mode dominated:}
+\(f_2>2f_t\) and \(f_2>0.5\).
 Physical harmonic \((m,n)=(2,0)\). Ensemble mean \(\overline{f_2}=85.3\%\),
 \(\overline{f_t}=7.4\%\).
-\item \textbf{Branch \(B_2\) --- Temporally dominated:} \(f_t>0.70\).
+\item \textbf{Branch \(B_2\) --- Temporally dominated:} \(f_t>2f_2\) and \(f_t>0.5\).
 Physical harmonic \((m,n)=(1,1)\). Ensemble mean \(\overline{f_2}=7.5\%\),
 \(\overline{f_t}=88.1\%\).
-\item \textbf{Branch \(B_3\) --- Mixed:} Neither \(f_2>0.70\) nor \(f_t>0.70\).
+\item \textbf{Branch \(B_3\) --- Mixed:} none of the above.
 Ensemble mean \(\overline{f_2}=34.8\%\), \(\overline{f_t}=43.9\%\).
 \end{itemize}
 The empirical selection frequency over \(N_s\) independent seeds is
 \(\widehat P(B_k)=N_k/N_s\). Selection diversity is measured by normalized Shannon
-entropy \(H_N=-\frac{1}{\ln 3}\sum_k\widehat P(B_k)\ln\widehat P(B_k)\), which
+entropy \(H_N=-\frac{1}{\ln 4}\sum_k\widehat P(B_k)\ln\widehat P(B_k)\), which
 equals zero for deterministic single-branch selection and unity for a uniform
-distribution over all three classes. Detailed implementation parameters and
+distribution over all four classes. The reference campaign of
+Sec.~\ref{sec:global_landscape}, conducted at \(\lambda_{\mathrm{var}}=1\), contains
+no \(B_{\mathrm{first}}\) realization; this branch becomes populated only when the
+variance regularizer is weakened or removed (Sec.~\ref{sec:lambda_var}). In the
+original three-class scheme these first-harmonic realizations were grouped with the
+mixed branch \(B_3\); the explicit four-class classification shows that they
+constitute a distinct attractor. Detailed implementation parameters and
 realization-level campaign data are provided in the Supplementary Material.
 
 %--------------------------------------------------------------
@@ -481,8 +498,10 @@ realization-level classifications are reported in Supplementary Table~S1.}
 
 \begin{table}[t]
 \centering
-\caption{Global statistics of the three empirical branch classes over the
-185-realization \((Re,E^*)\) campaign. Modal fractions in percentages.}
+\caption{Global statistics of the empirical branch classes populated over the
+185-realization \((Re,E^*)\) campaign at \(\lambda_{\mathrm{var}}=1\) (no
+\(B_{\mathrm{first}}\) realization occurs at this weight). Modal fractions in
+percentages.}
 \label{tab:branch_statistics}
 \small
 \begin{tabular}{lcccccc}
@@ -502,7 +521,11 @@ is the most significant feature of the global landscape: while the stationary
 second-harmonic branch is frequently accessible, it does not dominate the ensemble
 to the point of being the unique or near-deterministic outcome. The mixed branch
 \(B_3\) is the least frequently selected, arising primarily at elevated actuation
-energies \(E^*\ge1\) and higher Reynolds numbers. The branch frequencies exhibit
+energies \(E^*\ge1\) and higher Reynolds numbers. No \(B_{\mathrm{first}}\)
+realization occurs anywhere in this campaign: the first-harmonic fraction remains
+below \(f_1=0.13\) throughout, confirming that the reference weight
+\(\lambda_{\mathrm{var}}=1\) actively excludes the fundamental mode. The branch
+frequencies exhibit
 a clear \(Re\)-dependence: \(B_1\) is more readily accessible at moderate \(Re\)
 around 500, while at \(Re\in[100,300]\), \(B_2\) often dominates. This suggests
 that the relative depths of the two competing optimization basins vary systematically
@@ -515,9 +538,12 @@ realizations in the two-dimensional \((f_2,f_t)\) observable space. Three distin
 clusters are clearly visible, separated by low-density gaps. The \(B_1\) cluster
 concentrates near the \(f_t\approx0\) axis at high \(f_2\); the \(B_2\) cluster
 concentrates near the \(f_2\approx0\) axis at high \(f_t\); and the \(B_3\) cluster
-occupies an intermediate region. The cluster separation establishes that the three
+occupies an intermediate region. The cluster separation establishes that the
 branch classes are well-defined structural entities rather than arbitrary divisions
-of a continuous distribution.
+of a continuous distribution. The first-harmonic class \(B_{\mathrm{first}}\) does
+not appear in this observable space because it is not populated at
+\(\lambda_{\mathrm{var}}=1\); it emerges only for weakened variance regularization
+(Sec.~\ref{sec:lambda_var}).
 
 \begin{figure}[t]
 \centering
@@ -583,34 +609,35 @@ given in Supplementary Sec.~S4.
 \centering
 \caption{Empirical branch-selection frequencies from the \(\lambda_{\mathrm{var}}\)
 sensitivity campaign. Each entry is based on five independent realizations at
-fixed \((Re,E^*)\). \(H_N\) is the normalized branch-selection entropy. Complete
+fixed \((Re,E^*)\). \(H_N\) is the normalized branch-selection entropy
+(normalised by \(\ln 4\)). Complete
 95\% confidence intervals are provided in Supplementary Sec.~S4.}
 \label{tab:lambda_branch_selection}
 \scriptsize
-\begin{tabular}{cccccccc}
+\begin{tabular}{cccccccccc}
 \toprule
-\(Re\) & \(E^*\) & \(\lambda_{\mathrm{var}}\) & \(\widehat P(B_1)\) & \(\widehat P(B_2)\) & \(\widehat P(B_3)\) & \(H_N\) & Dominant class\\
+\(Re\) & \(E^*\) & \(\lambda_{\mathrm{var}}\) & \(\widehat P(B_1)\) & \(\widehat P(B_2)\) & \(\widehat P(B_{\mathrm{first}})\) & \(\widehat P(B_3)\) & \(H_N\) & Dominant class\\
 \midrule
-500  & 0.25 & 0    & 0.0 & 0.0 & 1.0 & 0.000 & \(B_3\)\\
-500  & 0.25 & 0.25 & 0.6 & 0.4 & 0.0 & 0.613 & \(B_1\)\\
-500  & 0.25 & 0.5  & 0.4 & 0.2 & 0.4 & 0.960 & \(B_1/B_3\)\\
-500  & 0.25 & 1    & 0.4 & 0.2 & 0.4 & 0.960 & \(B_1/B_3\)\\
-500  & 0.25 & 2    & 0.4 & 0.4 & 0.2 & 0.960 & \(B_1/B_2\)\\
-500  & 0.25 & 5    & 0.4 & 0.6 & 0.0 & 0.613 & \(B_2\)\\
+500  & 0.25 & 0    & 0.0 & 0.0 & 1.0 & 0.0 & 0.000 & \(B_{\mathrm{first}}\)\\
+500  & 0.25 & 0.25 & 0.6 & 0.4 & 0.0 & 0.0 & 0.485 & \(B_1\)\\
+500  & 0.25 & 0.5  & 0.4 & 0.2 & 0.0 & 0.4 & 0.761 & \(B_1/B_3\)\\
+500  & 0.25 & 1    & 0.4 & 0.2 & 0.0 & 0.4 & 0.761 & \(B_1/B_3\)\\
+500  & 0.25 & 2    & 0.4 & 0.4 & 0.0 & 0.2 & 0.761 & \(B_1/B_2\)\\
+500  & 0.25 & 5    & 0.4 & 0.6 & 0.0 & 0.0 & 0.485 & \(B_2\)\\
 \midrule
-700  & 2    & 0    & 0.0 & 0.0 & 1.0 & 0.000 & \(B_3\)\\
-700  & 2    & 0.25 & 0.0 & 0.0 & 1.0 & 0.000 & \(B_3\)\\
-700  & 2    & 0.5  & 0.0 & 0.6 & 0.4 & 0.613 & \(B_2\)\\
-700  & 2    & 1    & 0.2 & 0.4 & 0.4 & 0.960 & \(B_2/B_3\)\\
-700  & 2    & 2    & 0.6 & 0.2 & 0.2 & 0.960 & \(B_1\)\\
-700  & 2    & 5    & 0.6 & 0.2 & 0.2 & 0.960 & \(B_1\)\\
+700  & 2    & 0    & 0.0 & 0.0 & 1.0 & 0.0 & 0.000 & \(B_{\mathrm{first}}\)\\
+700  & 2    & 0.25 & 0.0 & 0.0 & 1.0 & 0.0 & 0.000 & \(B_{\mathrm{first}}\)\\
+700  & 2    & 0.5  & 0.0 & 0.6 & 0.0 & 0.4 & 0.485 & \(B_2\)\\
+700  & 2    & 1    & 0.2 & 0.4 & 0.0 & 0.4 & 0.761 & \(B_2/B_3\)\\
+700  & 2    & 2    & 0.6 & 0.2 & 0.0 & 0.2 & 0.685 & \(B_1\)\\
+700  & 2    & 5    & 0.6 & 0.2 & 0.0 & 0.2 & 0.685 & \(B_1\)\\
 \midrule
-1000 & 1    & 0    & 0.0 & 0.0 & 1.0 & 0.000 & \(B_3\)\\
-1000 & 1    & 0.25 & 0.0 & 0.6 & 0.4 & 0.613 & \(B_2\)\\
-1000 & 1    & 0.5  & 0.4 & 0.4 & 0.2 & 0.960 & \(B_1/B_2\)\\
-1000 & 1    & 1    & 0.4 & 0.4 & 0.2 & 0.960 & \(B_1/B_2\)\\
-1000 & 1    & 2    & 0.4 & 0.4 & 0.2 & 0.960 & \(B_1/B_2\)\\
-1000 & 1    & 5    & 0.4 & 0.6 & 0.0 & 0.613 & \(B_2\)\\
+1000 & 1    & 0    & 0.0 & 0.0 & 1.0 & 0.0 & 0.000 & \(B_{\mathrm{first}}\)\\
+1000 & 1    & 0.25 & 0.0 & 0.6 & 0.0 & 0.4 & 0.485 & \(B_2\)\\
+1000 & 1    & 0.5  & 0.4 & 0.4 & 0.0 & 0.2 & 0.761 & \(B_1/B_2\)\\
+1000 & 1    & 1    & 0.4 & 0.4 & 0.0 & 0.2 & 0.761 & \(B_1/B_2\)\\
+1000 & 1    & 2    & 0.4 & 0.4 & 0.0 & 0.2 & 0.761 & \(B_1/B_2\)\\
+1000 & 1    & 5    & 0.4 & 0.6 & 0.0 & 0.0 & 0.485 & \(B_2\)\\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -620,23 +647,31 @@ fixed \((Re,E^*)\). \(H_N\) is the normalized branch-selection entropy. Complete
 \includegraphics[width=0.90\textwidth]{fig03_lambda_branch_probabilities.pdf}
 \caption{Empirical redistribution of branch-selection frequencies with the
 variance-regularization weight \(\lambda_{\mathrm{var}}\) for three fixed operating
-conditions. Each frequency is estimated from five independent realizations per
-\(\lambda_{\mathrm{var}}\) value. Error bars indicate 95\% Wilson-score confidence
-intervals.}
+conditions. Heatmaps show the four classes \(B_1\), \(B_2\),
+\(B_{\mathrm{first}}\), and \(B_3\); cell values are empirical frequencies
+estimated from five independent realizations per \(\lambda_{\mathrm{var}}\) value.
+95\% Wilson-score confidence intervals are tabulated in Supplementary Sec.~S4.}
 \label{fig:lambda_branch_probabilities}
 \end{figure*}
 
 At \(\lambda_{\mathrm{var}}=0\), all three operating conditions yield exclusively
-\(B_3\) realizations (\(H_N=0\)): in the absence of spatial-variance regularization,
-the optimizer collapses to mixed-mode controls without developing spatially structured
-patterns. Introducing any nonzero \(\lambda_{\mathrm{var}}\) immediately activates
-structured patterns, shifting accessibility toward \(B_1\) or \(B_2\) depending on
-the operating point. The transition is non-monotonic: at \((Re,E^*)=(500,0.25)\),
-\(B_1\) frequency is maximized at intermediate \(\lambda_{\mathrm{var}}\approx0.25\),
-whereas larger values shift the distribution toward \(B_2\), reaching
+\(B_{\mathrm{first}}\) realizations (\(H_N=0\)): in the absence of spatial-variance
+regularization the optimizer collapses onto the lowest-order stationary mode, the
+single-lobe fundamental \(\sin(\pi x)\), which is spatially structured rather than
+mixed. The suppression of \(B_{\mathrm{first}}\) by a positive
+\(\lambda_{\mathrm{var}}\) is operating-point dependent: at \((Re,E^*)=(500,0.25)\)
+and \((1000,1)\) the branch is absent already at the smallest tested positive weight
+\(\lambda_{\mathrm{var}}=0.25\), whereas at \((700,2)\) \(B_{\mathrm{first}}\) persists
+at \(\lambda_{\mathrm{var}}=0.25\) (5/5 realizations) and disappears only at
+\(\lambda_{\mathrm{var}}=0.5\). The transition threshold is therefore operating-point
+dependent rather than universally determined by the sign of \(\lambda_{\mathrm{var}}\).
+For \(\lambda_{\mathrm{var}}\ge0.5\) the
+distribution redistributes non-monotonically: at \((Re,E^*)=(500,0.25)\), \(B_1\)
+frequency is maximized at intermediate \(\lambda_{\mathrm{var}}\approx0.25\), whereas
+larger values shift the distribution toward \(B_2\), reaching
 \(\widehat P(B_2)=0.6\) at \(\lambda_{\mathrm{var}}=5\). At \((Re,E^*)=(700,2)\),
 the opposite trajectory is observed: values in the range \([2,5]\) favor \(B_1\)
-even though small values favor \(B_3\) or \(B_2\). These results demonstrate that
+even though small values favor \(B_2\) or \(B_3\). These results demonstrate that
 variance regularization acts as an optimization landscape bias: it modifies which
 basin of attraction the optimizer enters during training without modifying the
 underlying fluid-mechanics problem. This constitutes direct evidence that the branch
@@ -658,7 +693,9 @@ at large actuation amplitudes the optimizer increasingly distributes control ene
 away from the second harmonic toward additional spatial and temporal components.
 This transition reflects the fact that at high energy the energy budget can be
 satisfied by many different modal mixtures, making the second-harmonic basin less
-uniquely attractive. Extended energy sweep datasets are provided in Supplementary Sec.~S5.
+uniquely attractive. Throughout the sweep the first-harmonic fraction remains small
+(\(f_1\le8\%\)), so the \(B_{\mathrm{first}}\) branch is never selected at the
+reference weight. Extended energy sweep datasets are provided in Supplementary Sec.~S5.
 
 \begin{figure*}[t]
 \centering
@@ -677,7 +714,10 @@ low to moderate energies but erodes at \(E^*\ge1\).}
 Ten independent random seeds at \(Re=500\), \(E^*=0.25\) produced 4 second-mode
 dominated (\(B_1\)), 4 temporally dominated (\(B_2\)), and 2 intermediate (\(B_3\))
 realizations. Figure~\ref{fig:seed_multiplicity} illustrates the seed-to-seed
-outcomes in the \((f_2,f_t)\) space. Despite qualitatively distinct modal structures,
+outcomes in the \((f_2,f_t)\) space. No seed selects the first-harmonic branch
+(\(f_1<0.02\) for all ten seeds), confirming that \(B_{\mathrm{first}}\) is not a
+low-energy accidental outcome at the reference weight. Despite qualitatively distinct
+modal structures,
 total training losses are tightly clustered within \([1.371,1.394]\), a relative
 spread of only 1.7\%. The \(B_1\) and \(B_2\) realizations achieve essentially
 equivalent loss values, confirming that the two branches are separated by distinct
@@ -717,35 +757,40 @@ depth.}
 Ablation experiments at \(Re=500\), \(E^*=0.25\) isolate the role of individual
 loss components. Table~\ref{tab:loss_ablation} reports results for single and dual
 term removals. Removing \(\mathcal{L}_{\mathrm{var}}\) alone causes \(f_2\) to
-collapse from \(92.2\%\) to \(0.2\%\)---a complete modal-class shift from \(B_1\)
-to the unstructured regime. Removing \(\mathcal{L}_{Re}\) or
+collapse from \(92.2\%\) to \(0.2\%\) while the first-harmonic fraction \(f_1\)
+jumps from \(0.0\%\) to \(90.4\%\): the modal class shifts completely from the
+second-harmonic branch \(B_1\) to the first-harmonic branch
+\(B_{\mathrm{first}}\). Removing \(\mathcal{L}_{Re}\) or
 \(\mathcal{L}_{\mathrm{diss}}\) individually leaves \(f_2\) essentially unchanged
 at \(92.2\)--\(92.3\%\). Dual ablations confirm that the shift induced by removing
 \(\mathcal{L}_{\mathrm{var}}\) is not amplified or modulated by simultaneously
-removing other terms. Reducing \(\lambda_{\mathrm{var}}\) by half decreases
-second-mode concentration modestly to \(89.3\%\), while doubling it increases it
-to \(92.8\%\). These results establish that \(\mathcal{L}_{\mathrm{var}}\) is the
-critical loss term for \(B_1\) selection, and that its action is not redundant
-with the dissipation or \(Re\)-separation terms. Additional ablation datasets are
-given in Supplementary Sec.~S5.
+removing other terms; in every case the outcome is \(B_{\mathrm{first}}\). Reducing
+\(\lambda_{\mathrm{var}}\) by half decreases second-mode concentration modestly to
+\(89.3\%\), while doubling it increases it to \(92.8\%\). These results establish
+that \(\mathcal{L}_{\mathrm{var}}\) is the critical loss term for \(B_1\) selection
+and, equivalently, for excluding \(B_{\mathrm{first}}\), and that its action is not
+redundant with the dissipation or \(Re\)-separation terms. Additional ablation
+datasets are given in Supplementary Sec.~S5.
 
 \begin{table*}[t]
 \centering
-\caption{Loss-term ablation results at \(Re=500\), \(E^*=0.25\).}
+\caption{Loss-term ablation results at \(Re=500\), \(E^*=0.25\). The
+first-harmonic fraction \(f_1\) isolates the modal-class shift induced by removing
+\(\mathcal{L}_{\mathrm{var}}\).}
 \label{tab:loss_ablation}
 \small
-\begin{tabular}{lcccc}
+\begin{tabular}{lccccc}
 \toprule
-Configuration & \(E_r\) & \(f_2\) (\%) & \(f_t\) (\%) & Interpretation\\
+Configuration & \(E_r\) & \(f_1\) (\%) & \(f_2\) (\%) & \(f_t\) (\%) & Class\\
 \midrule
-Baseline & 0.2534 & 92.2 & 1.3 & Second-mode dominated\\
-No \(\mathcal{L}_{\mathrm{var}}\) & 0.2582 & 0.2 & 5.1 & Modal-class shift\\
-No \(\mathcal{L}_{Re}\) & 0.2534 & 92.2 & 1.3 & Essentially unchanged\\
-No \(\mathcal{L}_{\mathrm{diss}}\) & 0.2533 & 92.3 & 1.2 & Essentially unchanged\\
-No \(\mathcal{L}_{\mathrm{var}},\mathcal{L}_{Re}\) & 0.2582 & 0.2 & 5.1 & Same shift as removing \(\mathcal{L}_{\mathrm{var}}\)\\
-No \(\mathcal{L}_{\mathrm{var}},\mathcal{L}_{\mathrm{diss}}\) & 0.2578 & 0.3 & 5.0 & Same shift as removing \(\mathcal{L}_{\mathrm{var}}\)\\
-\(\lambda_{\mathrm{var}}/2\) & 0.2546 & 89.3 & 1.5 & Reduced concentration\\
-\(2\lambda_{\mathrm{var}}\) & 0.2598 & 92.8 & 1.0 & Slightly increased concentration\\
+Baseline & 0.2534 & 0.0 & 92.2 & 1.3 & \(B_1\)\\
+No \(\mathcal{L}_{\mathrm{var}}\) & 0.2582 & 90.4 & 0.2 & 5.1 & \(B_{\mathrm{first}}\)\\
+No \(\mathcal{L}_{Re}\) & 0.2534 & 0.0 & 92.2 & 1.3 & \(B_1\)\\
+No \(\mathcal{L}_{\mathrm{diss}}\) & 0.2533 & 0.0 & 92.3 & 1.2 & \(B_1\)\\
+No \(\mathcal{L}_{\mathrm{var}},\mathcal{L}_{Re}\) & 0.2582 & 90.4 & 0.2 & 5.1 & \(B_{\mathrm{first}}\)\\
+No \(\mathcal{L}_{\mathrm{var}},\mathcal{L}_{\mathrm{diss}}\) & 0.2578 & 90.5 & 0.3 & 5.0 & \(B_{\mathrm{first}}\)\\
+\(\lambda_{\mathrm{var}}/2\) & 0.2546 & 0.2 & 89.3 & 1.5 & \(B_1\)\\
+\(2\lambda_{\mathrm{var}}\) & 0.2598 & 0.1 & 92.8 & 1.0 & \(B_1\)\\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -895,8 +940,9 @@ realizations; time-dominated configurations such as the modified-Chebyshev cells
 (bas\_cheb) recover \(B_2\) in 5/5 realizations at every tested Reynolds number;
 and the mixed cells reproduce their expected fractions (e.g.\ mc\_8x9:
 \(B_1\)/\(B_2\)/\(B_3=2/2/1\); bas\_fourier\_re100: 1/3/1), with
-ar\_rect\_half re-converging to the temporally dominated class (1/4/0). Independently, re-classifying the entire 185-realization campaign with
-the threshold rule (\(B_1\): \(f_2>2f_t\) and \(f_2>0.5\); \(B_2\):
+ar\_rect\_half re-converging to the temporally dominated class (1/4/0). Independently, re-classifying the entire 185-realization reference campaign
+(\(\lambda_{\mathrm{var}}=1\)) with
+the four-class threshold rule (\(B_{\mathrm{first}}\): \(f_1>0.5\); \(B_1\): \(f_2>2f_t\) and \(f_2>0.5\); \(B_2\):
 \(f_t>2f_2\) and \(f_t>0.5\); otherwise \(B_3\)) reproduces the frozen labels
 with \textbf{zero disagreements (0/185)}, confirming the internal consistency of
 the branch taxonomy and of the multi-seed audit. The per-configuration audit
@@ -1034,10 +1080,13 @@ grid-uncertainty band for this observable.
 The conclusions of this study are insensitive to this band: (i) relative
 comparisons are made at fixed \(N\), so the uncertainty largely cancels in the
 ratios (e.g.\ \(\varepsilon_{k=1}/\varepsilon_{\mathrm{unif}}\) at fixed
-\(N=512\)); (ii) the dissipation reduction of the second-harmonic control
-relative to the uniform lid is \(76.5\%\) at \(N=256\) and \(73.8\%\) using the
-extrapolated \(\varepsilon_\infty\), both far outside the 14\% band, so the
-qualitative ranking B1 (low dissipation) is unchanged; (iii) the same hierarchy
+\(N=512\)); (ii) the dissipation reduction of the second-harmonic control relative to the
+uniform lid (a non-iso-energetic comparison) is \(76.5\%\) at \(N=256\) and
+\(73.8\%\) using the extrapolated \(\varepsilon_\infty\), both far outside the
+14\% band, so the qualitative conclusion of reduced dissipation relative to the
+uniform baseline is unchanged, and the fixed-energy ranking
+\(k=1<\,\mathrm{uniform}<\,k=2\) (Sec.~\ref{sec:focused_comparison}) is likewise
+unaffected since it rests on ratios at a common grid; (iii) the same hierarchy
 is reproduced at the coarser grid in the energy-matched comparison, providing a
 resolution cross-check in addition to the Richardson estimate.
 
@@ -1063,8 +1112,11 @@ stationary second-harmonic Fourier control establishes a quasi-steady flow state
 By contrast, modified-Chebyshev controls produce profoundly unsteady responses
 with \(R_K\ge44\%\) at all Reynolds numbers and \(R_K=847\%\) at \(Re=100\).
 The two representations therefore generate qualitatively different physical flow
-states: Fourier \(B_1\) controls produce steady, low-dissipation cavity flows,
-while Chebyshev controls produce highly oscillatory, energetically costly flows.
+states: Fourier \(B_1\) controls produce steady cavity flows with substantially
+lower integrated dissipation than the uniform-lid baseline, while Chebyshev
+controls produce highly oscillatory, energetically costly flows. (At a fixed
+actuation energy the second-harmonic control is, however, more dissipative than
+the first harmonic and the uniform lid; Sec.~\ref{sec:focused_comparison}.)
 The quasi-stationarity diagnostic provides independent physical confirmation that
 the Fourier \(B_1\) branch corresponds to a physically realizable steady-state
 control target.
@@ -1133,10 +1185,22 @@ uniform baseline at the same energy budget at both resolutions, with
 \(\varepsilon_{k=1}/\varepsilon_{\mathrm{uniform}}\) in the range
 \(\left[0.646\;(N=512),\;0.726\;(N=256)\right]\).
 The energy-matched ranking $k=1$\,$<$\,uniform\,$<$\,$k=2$ ($B_1$) is therefore
-unchanged across the tested grids.
-However, the PINN optimizer systematically selects the second-harmonic \(B_1\) structure over the
-first-harmonic structure due to the variance-regularization loss \(\mathcal{L}_{\mathrm{var}}\),
-which heavily penalizes low spatial frequencies and flat profiles.
+unchanged across the tested grids. The pure first-harmonic profile (ii) is
+precisely the \(B_{\mathrm{first}}\) branch: the branch that is *not* selected at
+the reference weight \(\lambda_{\mathrm{var}}=1\) is the one that is energetically
+preferable to both the uniform lid and \(B_1\). This reinforces that branch
+accessibility, not physical optimality, is what the reference loss formulation
+controls.
+However, the PINN optimizer systematically selects the second-harmonic \(B_1\)
+structure over the first-harmonic structure under the variance-regularization
+loss \(\mathcal{L}_{\mathrm{var}}\). Under the present sine-basis parameterization
+this regularizer favors sign-changing controls with larger spatial variance rather
+than penalizing wavenumber directly:
+\(\operatorname{Var}[\sin(\pi x)]=1/2-4/\pi^2\approx0.0947\) for the positive
+single-lobe profile versus \(\operatorname{Var}[\sin(2\pi x)]=1/2\) for the
+balanced two-lobe profile. The term therefore biases branch selection toward the
+second harmonic over the positive first-harmonic profile at matched actuation
+energy.
 
 The temporal \(B_2\) and mixed \(B_3\) controls produce strongly unsteady flows
 (for the \(B_2\) reference realization the kinetic-energy fluctuation ratio is
@@ -1174,12 +1238,19 @@ global accessibility of \(B_1\) (42.2\%) and \(B_2\) (43.8\%) further confirms
 that neither branch dominates globally. The concept of a ``dominant'' mode must
 therefore be replaced by ``frequently accessible under the given formulation.''
 
-The \(B_3\) mixed branch, accounting for only 14.1\% of realizations, is
-selectively favored by low variance regularization (\(\lambda_{\mathrm{var}}=0\))
-and high actuation energy. Its less frequent appearance in the reference campaign
-suggests it lies in shallower basins under standard loss weights, but the
-\(\lambda_{\mathrm{var}}=0\) results show it becomes the exclusive outcome when
-the loss landscape is flattened in the spatial-variance dimension.
+The \(B_3\) mixed branch, accounting for 14.1\% of realizations in the reference
+campaign, is selectively favored by high actuation energy and elevated Reynolds
+number; its less frequent appearance under standard loss weights suggests it lies
+in shallower basins. The first-harmonic branch \(B_{\mathrm{first}}\), absent at the
+reference weight \(\lambda_{\mathrm{var}}=1\), becomes the exclusive outcome once
+the spatial-variance penalty is removed (\(\lambda_{\mathrm{var}}=0\), \(H_N=0\)):
+without this penalty the optimizer selects the lowest-order stationary mode, the
+single-lobe profile \(\sin(\pi x)\), precisely the control that the variance
+regularizer disfavors (spatial variance \(0.0947\) versus \(1/2\)) in favour of the
+two-lobe second-harmonic structure. The two
+branches \(B_{\mathrm{first}}\) and \(B_1\) therefore bracket the range of spatially
+stationary controls that the variational formulation can select, and the choice
+between them is controlled by a single loss weight rather than by the flow physics.
 
 \subsection{Physical origin of second-harmonic recurrence}
 
@@ -1190,21 +1261,33 @@ generating a pair of counter-rotating recirculation cells rather than the single
 primary vortex of the uniform-lid cavity. This produces a more symmetric and
 geometrically balanced velocity gradient distribution, reducing the regions of
 intense shear that dominate viscous dissipation. The resulting \(70\)--\(82\%\)
-dissipation reduction, confirmed by the independent LBM calculations, provides
-direct physical validation of the modal structure.
+dissipation reduction relative to the uniform-lid baseline, confirmed by the
+independent LBM calculations, provides direct physical validation of the modal
+structure under a non-iso-energetic comparison. At a fixed actuation energy the
+second-harmonic control is in fact more dissipative than both the first harmonic
+and the uniform lid (Sec.~\ref{sec:focused_comparison}); its frequent selection
+therefore reflects accessibility under the optimization formulation rather than
+energetic optimality.
 
 The quasi-stationarity of the Fourier \(B_1\) controlled flow (\(R_K\le0.65\%\))
-is a further physical confirmation: the actuation profile selected by the optimizer
-generates a steady cavity state, consistent with a variational minimum of the
-dissipation functional at fixed actuation energy. In contrast, the Chebyshev
-controls produce highly unsteady flows (\(R_K\ge44\%\)), representing a class of
-control response in which added kinetic energy of temporal oscillations prevents
-convergence to a low-dissipation steady state. This qualitative physical difference
+is a further physical confirmation of \emph{realizability}: the actuation profile
+selected by the optimizer generates a steady cavity state, showing that the branch
+is attainable as a physically realizable steady control. Realizability is distinct
+from energetic optimality: at a fixed actuation energy the iso-energetic comparison
+of Sec.~\ref{sec:focused_comparison} shows \(B_1\) to be more dissipative than both
+the first harmonic and the uniform lid. In contrast, the Chebyshev controls produce
+highly unsteady flows (\(R_K\ge44\%\)), representing a class of control response in
+which added kinetic energy of temporal oscillations prevents convergence to a
+quasi-stationary steady state. This qualitative physical difference
 provides an independent explanation for why the two representations lead to
 different branch outcomes.
 
 The persistence of the second-harmonic structure across capacities and truncations
-is consistent with it being a genuine physical low-dissipation mode. However,
+is consistent with it being a genuine physical steady-state mode: it yields
+quasi-stationary flows with dissipation far below the uniform-lid baseline
+(Table~\ref{tab:lbm_dissipation}). The fixed-energy ranking of
+Sec.~\ref{sec:focused_comparison} nevertheless shows that it is not the
+least-dissipative stationary profile at a common actuation budget. However,
 the erosion of \(f_2\) at high energy (\(E^*=2\)) and at compressed geometry
 (\(AR=0.5\)) shows that the second-harmonic basin is not infinitely deep: when
 the energy budget or geometry changes sufficiently, other modal strategies become
@@ -1218,7 +1301,8 @@ The loss-ablation results demonstrate that the dominant driver of \(B_1\) select
 is \(\mathcal{L}_{\mathrm{var}}\), not \(\mathcal{L}_{\mathrm{diss}}\). Removing
 \(\mathcal{L}_{\mathrm{diss}}\) leaves \(f_2\) essentially unchanged (\(92.3\%\)
 vs.\ baseline \(92.2\%\)), while removing \(\mathcal{L}_{\mathrm{var}}\) causes a
-complete modal-class shift to \(f_2=0.2\%\). This means that in the reference loss
+complete modal-class shift to the first-harmonic branch \(B_{\mathrm{first}}\)
+(\(f_1=90.4\%\), \(f_2=0.2\%\)). This means that in the reference loss
 formulation, the spatial-variance penalty acts as the primary optimization landscape
 shaper, directing the search into the basin of attraction of the spatially structured
 \(B_1\) control. The physical dissipation objective, while present and contributing
@@ -1226,13 +1310,17 @@ to overall convergence quality, plays a secondary role in determining which basi
 is entered.
 
 This does not invalidate the physical relevance of the identified controls: the
-LBM verification confirms that the controls genuinely reduce viscous dissipation,
-and the quasi-stationarity analysis confirms they are physically realizable. What
-the ablation result reveals is a distinction between \emph{which loss term selects
-the branch} and \emph{which physical property justifies the selected branch}.
-The variance regularization acts as an implicit basis selector, preferring spatially
-structured controls among competing optima; the dissipation objective then evaluates
-those controls and finds the second-harmonic structure favorable. Practitioners
+LBM verification confirms that the controls reduce integrated viscous dissipation
+relative to the uniform-lid baseline, and the quasi-stationarity analysis confirms
+they are physically realizable. What the ablation result reveals is a distinction
+between \emph{which loss term selects the branch} and \emph{which physical property
+justifies the selected branch}. The variance regularization acts as an implicit
+selector of controls with larger spatial variance (in the sine basis, the
+sign-changing two-lobe profile over the positive single-lobe one); the dissipation
+objective then evaluates those controls. They reduce dissipation relative to the
+uniform lid, but under a strictly iso-energetic comparison the first harmonic is
+the least dissipative of the tested stationary profiles
+(Sec.~\ref{sec:focused_comparison}). Practitioners
 designing physics-informed control problems should be aware that the loss weight
 configuration may be as consequential as the physical objective in determining which
 branch is selected.
@@ -1333,20 +1421,28 @@ branch selection in physics-informed active flow control of the lid-driven cavit
 The principal findings are as follows.
 
 \begin{enumerate}
-\item \textbf{Three empirical branch classes are reproducibly identified.}
-A broad \((Re,E^*)\) campaign of 185 independent PINN optimizations reveals three
-structurally distinct and well-separated branch classes: \(B_1\) (stationary
+\item \textbf{Four empirical branch classes are reproducibly identified.}
+A broad \((Re,E^*)\) campaign of 185 independent PINN optimizations at the
+reference weight \(\lambda_{\mathrm{var}}=1\) reveals three structurally distinct and
+well-separated populated branch classes: \(B_1\) (stationary
 second-harmonic dominated, 42.2\%), \(B_2\) (temporally dominated, 43.8\%), and
-\(B_3\) (mixed, 14.1\%). The near balance of \(B_1\) and \(B_2\) demonstrates
+\(B_3\) (mixed, 14.1\%). A fourth class, the stationary first-harmonic branch
+\(B_{\mathrm{first}}\), is not populated at this weight but emerges as the exclusive
+outcome when the variance regularizer is removed (Sec.~\ref{sec:lambda_var}). The
+near balance of \(B_1\) and \(B_2\) demonstrates
 that neither branch uniquely dominates the optimization landscape; both are
 frequently accessible.
 
 \item \textbf{Branch accessibility depends on the optimization formulation.}
 The variance-regularization weight \(\lambda_{\mathrm{var}}\) is the dominant
 determinant of branch selection. At \(\lambda_{\mathrm{var}}=0\), all conditions
-yield exclusively \(B_3\) outcomes; increasing \(\lambda_{\mathrm{var}}\)
-non-monotonically shifts accessibility between \(B_1\) and \(B_2\) in a way that
-depends on the operating point. The branch structure is jointly a property of
+yield exclusively \(B_{\mathrm{first}}\) outcomes. Suppression of the first-harmonic
+branch by a positive \(\lambda_{\mathrm{var}}\) is operating-point dependent: complete
+already at \(\lambda_{\mathrm{var}}=0.25\) for \((Re,E^*)=(500,0.25)\) and
+\((1000,1)\), but reached only at \(\lambda_{\mathrm{var}}=0.5\) for \((700,2)\).
+Increasing \(\lambda_{\mathrm{var}}\) further non-monotonically shifts accessibility
+between \(B_1\) and \(B_2\) in a way that depends on the operating point. The branch
+structure is jointly a property of
 the fluid problem and the variational formulation, not of the fluid problem alone.
 
 \item \textbf{Random initialization produces competing branches of comparable
@@ -1453,12 +1549,7 @@ The authors declare no competing interests.
 
 \section*{Data and Code Availability}
 Code, datasets, and LBM verification workflows are publicly available at:
-\url{https://github.com/geminiahmed25-Ahkat/conditional-modal-branch-selection-lid-driven-cavity}.
-The repository is self-contained (all paths relative to the repository root,
-dependencies of the companion work vendored in \texttt{vendor/paper1/}) and
-includes a step-by-step reproduction guide (\texttt{REPRODUCE.md}), the full
-quantitative results, and a SHA256 manifest of the large binary LBM fields,
-which are excluded from version control for size reasons.
+\url{https://github.com/Ahmedalgeria778/pinn-lid-driven-cavity-collapse}.
 
 %--------------------------------------------------------------
 \begin{thebibliography}{99}

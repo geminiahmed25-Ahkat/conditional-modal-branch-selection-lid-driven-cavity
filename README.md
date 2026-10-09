@@ -24,8 +24,12 @@ study without access to the authors' machine (see `REPRODUCE.md`).
 > The 185-run reference campaign (`lambda_var = 1`) is unchanged; the
 > `lambda_var = 0` and `No L_var` runs are dominated by the stationary first
 > harmonic `sin(πx/Lx)` (`B_first`), not by a "mixed"/temporal branch. The
-> corrected figures (`fig03`, `fig04`, `fig07`) and manuscript inside that folder
-> supersede the repository-root copies. See the folder's `README.md` and
+> repository-root manuscript, supplementary material, and `fig03`/`fig04`/`fig07`
+> have been updated accordingly, and the `corrections/` folder retains per-file
+> provenance, derivations, and the full report. Note that suppression of
+> `B_first` by a positive `lambda_var` is **operating-point dependent**: complete
+> at `lambda_var = 0.25` for `(Re,E*) = (500,0.25)` and `(1000,1)`, but reached
+> only at `lambda_var = 0.5` for `(700,2)`. See the folder's `README.md` and
 > `CORRECTION_REPORT.md`.
 
 ## Objectif

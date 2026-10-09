@@ -49,7 +49,8 @@ budget (dissipation ratio in \([1.072,1.188]\)), while the first harmonic is
 consistently less dissipative (ratio in \([0.646,0.726]\)), ranking first-harmonic
 $<$ uniform $<$ second-harmonic at both resolutions. Reproducibility experiments
 yield bit-identical double runs, and multi-seed audits confirm the branch taxonomy
-(0/185 reclassification disagreements); the results support conditional branch
+(0/185 reclassification disagreements in the reference campaign at
+\(\lambda_{\mathrm{var}}=1\)); the results support conditional branch
 accessibility and reproducibility but refute uniqueness or global optimality.
 
 \medskip\noindent\textbf{Keywords:} physics-informed neural networks; active flow
@@ -657,13 +658,14 @@ At \(\lambda_{\mathrm{var}}=0\), all three operating conditions yield exclusivel
 \(B_{\mathrm{first}}\) realizations (\(H_N=0\)): in the absence of spatial-variance
 regularization the optimizer collapses onto the lowest-order stationary mode, the
 single-lobe fundamental \(\sin(\pi x)\), which is spatially structured rather than
-mixed. Introducing any nonzero \(\lambda_{\mathrm{var}}\) immediately suppresses
-\(B_{\mathrm{first}}\) and shifts accessibility toward \(B_1\) or \(B_2\) depending on
-the operating point. At \((Re,E^*)=(700,2)\) the first-harmonic branch persists up to
-\(\lambda_{\mathrm{var}}=0.25\) and disappears only for larger values, whereas at the
-other two operating points it is removed by the smallest tested nonzero weight; the
-transition between \(B_{\mathrm{first}}\) and the second-order branches is therefore
-sharp in \(\lambda_{\mathrm{var}}\). For \(\lambda_{\mathrm{var}}\ge0.5\) the
+mixed. The suppression of \(B_{\mathrm{first}}\) by a positive
+\(\lambda_{\mathrm{var}}\) is operating-point dependent: at \((Re,E^*)=(500,0.25)\)
+and \((1000,1)\) the branch is absent already at the smallest tested positive weight
+\(\lambda_{\mathrm{var}}=0.25\), whereas at \((700,2)\) \(B_{\mathrm{first}}\) persists
+at \(\lambda_{\mathrm{var}}=0.25\) (5/5 realizations) and disappears only at
+\(\lambda_{\mathrm{var}}=0.5\). The transition threshold is therefore operating-point
+dependent rather than universally determined by the sign of \(\lambda_{\mathrm{var}}\).
+For \(\lambda_{\mathrm{var}}\ge0.5\) the
 distribution redistributes non-monotonically: at \((Re,E^*)=(500,0.25)\), \(B_1\)
 frequency is maximized at intermediate \(\lambda_{\mathrm{var}}\approx0.25\), whereas
 larger values shift the distribution toward \(B_2\), reaching
@@ -938,7 +940,8 @@ realizations; time-dominated configurations such as the modified-Chebyshev cells
 (bas\_cheb) recover \(B_2\) in 5/5 realizations at every tested Reynolds number;
 and the mixed cells reproduce their expected fractions (e.g.\ mc\_8x9:
 \(B_1\)/\(B_2\)/\(B_3=2/2/1\); bas\_fourier\_re100: 1/3/1), with
-ar\_rect\_half re-converging to the temporally dominated class (1/4/0). Independently, re-classifying the entire 185-realization campaign with
+ar\_rect\_half re-converging to the temporally dominated class (1/4/0). Independently, re-classifying the entire 185-realization reference campaign
+(\(\lambda_{\mathrm{var}}=1\)) with
 the four-class threshold rule (\(B_{\mathrm{first}}\): \(f_1>0.5\); \(B_1\): \(f_2>2f_t\) and \(f_2>0.5\); \(B_2\):
 \(f_t>2f_2\) and \(f_t>0.5\); otherwise \(B_3\)) reproduces the frozen labels
 with \textbf{zero disagreements (0/185)}, confirming the internal consistency of
@@ -1077,10 +1080,13 @@ grid-uncertainty band for this observable.
 The conclusions of this study are insensitive to this band: (i) relative
 comparisons are made at fixed \(N\), so the uncertainty largely cancels in the
 ratios (e.g.\ \(\varepsilon_{k=1}/\varepsilon_{\mathrm{unif}}\) at fixed
-\(N=512\)); (ii) the dissipation reduction of the second-harmonic control
-relative to the uniform lid is \(76.5\%\) at \(N=256\) and \(73.8\%\) using the
-extrapolated \(\varepsilon_\infty\), both far outside the 14\% band, so the
-qualitative ranking B1 (low dissipation) is unchanged; (iii) the same hierarchy
+\(N=512\)); (ii) the dissipation reduction of the second-harmonic control relative to the
+uniform lid (a non-iso-energetic comparison) is \(76.5\%\) at \(N=256\) and
+\(73.8\%\) using the extrapolated \(\varepsilon_\infty\), both far outside the
+14\% band, so the qualitative conclusion of reduced dissipation relative to the
+uniform baseline is unchanged, and the fixed-energy ranking
+\(k=1<\,\mathrm{uniform}<\,k=2\) (Sec.~\ref{sec:focused_comparison}) is likewise
+unaffected since it rests on ratios at a common grid; (iii) the same hierarchy
 is reproduced at the coarser grid in the energy-matched comparison, providing a
 resolution cross-check in addition to the Richardson estimate.
 
@@ -1106,8 +1112,11 @@ stationary second-harmonic Fourier control establishes a quasi-steady flow state
 By contrast, modified-Chebyshev controls produce profoundly unsteady responses
 with \(R_K\ge44\%\) at all Reynolds numbers and \(R_K=847\%\) at \(Re=100\).
 The two representations therefore generate qualitatively different physical flow
-states: Fourier \(B_1\) controls produce steady, low-dissipation cavity flows,
-while Chebyshev controls produce highly oscillatory, energetically costly flows.
+states: Fourier \(B_1\) controls produce steady cavity flows with substantially
+lower integrated dissipation than the uniform-lid baseline, while Chebyshev
+controls produce highly oscillatory, energetically costly flows. (At a fixed
+actuation energy the second-harmonic control is, however, more dissipative than
+the first harmonic and the uniform lid; Sec.~\ref{sec:focused_comparison}.)
 The quasi-stationarity diagnostic provides independent physical confirmation that
 the Fourier \(B_1\) branch corresponds to a physically realizable steady-state
 control target.
@@ -1182,9 +1191,16 @@ the reference weight \(\lambda_{\mathrm{var}}=1\) is the one that is energetical
 preferable to both the uniform lid and \(B_1\). This reinforces that branch
 accessibility, not physical optimality, is what the reference loss formulation
 controls.
-However, the PINN optimizer systematically selects the second-harmonic \(B_1\) structure over the
-first-harmonic structure due to the variance-regularization loss \(\mathcal{L}_{\mathrm{var}}\),
-which heavily penalizes low spatial frequencies and flat profiles.
+However, the PINN optimizer systematically selects the second-harmonic \(B_1\)
+structure over the first-harmonic structure under the variance-regularization
+loss \(\mathcal{L}_{\mathrm{var}}\). Under the present sine-basis parameterization
+this regularizer favors sign-changing controls with larger spatial variance rather
+than penalizing wavenumber directly:
+\(\operatorname{Var}[\sin(\pi x)]=1/2-4/\pi^2\approx0.0947\) for the positive
+single-lobe profile versus \(\operatorname{Var}[\sin(2\pi x)]=1/2\) for the
+balanced two-lobe profile. The term therefore biases branch selection toward the
+second harmonic over the positive first-harmonic profile at matched actuation
+energy.
 
 The temporal \(B_2\) and mixed \(B_3\) controls produce strongly unsteady flows
 (for the \(B_2\) reference realization the kinetic-energy fluctuation ratio is
@@ -1230,7 +1246,8 @@ reference weight \(\lambda_{\mathrm{var}}=1\), becomes the exclusive outcome onc
 the spatial-variance penalty is removed (\(\lambda_{\mathrm{var}}=0\), \(H_N=0\)):
 without this penalty the optimizer selects the lowest-order stationary mode, the
 single-lobe profile \(\sin(\pi x)\), precisely the control that the variance
-regularizer discards in favour of the two-lobe second-harmonic structure. The two
+regularizer disfavors (spatial variance \(0.0947\) versus \(1/2\)) in favour of the
+two-lobe second-harmonic structure. The two
 branches \(B_{\mathrm{first}}\) and \(B_1\) therefore bracket the range of spatially
 stationary controls that the variational formulation can select, and the choice
 between them is controlled by a single loss weight rather than by the flow physics.
@@ -1244,21 +1261,33 @@ generating a pair of counter-rotating recirculation cells rather than the single
 primary vortex of the uniform-lid cavity. This produces a more symmetric and
 geometrically balanced velocity gradient distribution, reducing the regions of
 intense shear that dominate viscous dissipation. The resulting \(70\)--\(82\%\)
-dissipation reduction, confirmed by the independent LBM calculations, provides
-direct physical validation of the modal structure.
+dissipation reduction relative to the uniform-lid baseline, confirmed by the
+independent LBM calculations, provides direct physical validation of the modal
+structure under a non-iso-energetic comparison. At a fixed actuation energy the
+second-harmonic control is in fact more dissipative than both the first harmonic
+and the uniform lid (Sec.~\ref{sec:focused_comparison}); its frequent selection
+therefore reflects accessibility under the optimization formulation rather than
+energetic optimality.
 
 The quasi-stationarity of the Fourier \(B_1\) controlled flow (\(R_K\le0.65\%\))
-is a further physical confirmation: the actuation profile selected by the optimizer
-generates a steady cavity state, consistent with a variational minimum of the
-dissipation functional at fixed actuation energy. In contrast, the Chebyshev
-controls produce highly unsteady flows (\(R_K\ge44\%\)), representing a class of
-control response in which added kinetic energy of temporal oscillations prevents
-convergence to a low-dissipation steady state. This qualitative physical difference
+is a further physical confirmation of \emph{realizability}: the actuation profile
+selected by the optimizer generates a steady cavity state, showing that the branch
+is attainable as a physically realizable steady control. Realizability is distinct
+from energetic optimality: at a fixed actuation energy the iso-energetic comparison
+of Sec.~\ref{sec:focused_comparison} shows \(B_1\) to be more dissipative than both
+the first harmonic and the uniform lid. In contrast, the Chebyshev controls produce
+highly unsteady flows (\(R_K\ge44\%\)), representing a class of control response in
+which added kinetic energy of temporal oscillations prevents convergence to a
+quasi-stationary steady state. This qualitative physical difference
 provides an independent explanation for why the two representations lead to
 different branch outcomes.
 
 The persistence of the second-harmonic structure across capacities and truncations
-is consistent with it being a genuine physical low-dissipation mode. However,
+is consistent with it being a genuine physical steady-state mode: it yields
+quasi-stationary flows with dissipation far below the uniform-lid baseline
+(Table~\ref{tab:lbm_dissipation}). The fixed-energy ranking of
+Sec.~\ref{sec:focused_comparison} nevertheless shows that it is not the
+least-dissipative stationary profile at a common actuation budget. However,
 the erosion of \(f_2\) at high energy (\(E^*=2\)) and at compressed geometry
 (\(AR=0.5\)) shows that the second-harmonic basin is not infinitely deep: when
 the energy budget or geometry changes sufficiently, other modal strategies become
@@ -1281,13 +1310,17 @@ to overall convergence quality, plays a secondary role in determining which basi
 is entered.
 
 This does not invalidate the physical relevance of the identified controls: the
-LBM verification confirms that the controls genuinely reduce viscous dissipation,
-and the quasi-stationarity analysis confirms they are physically realizable. What
-the ablation result reveals is a distinction between \emph{which loss term selects
-the branch} and \emph{which physical property justifies the selected branch}.
-The variance regularization acts as an implicit basis selector, preferring spatially
-structured controls among competing optima; the dissipation objective then evaluates
-those controls and finds the second-harmonic structure favorable. Practitioners
+LBM verification confirms that the controls reduce integrated viscous dissipation
+relative to the uniform-lid baseline, and the quasi-stationarity analysis confirms
+they are physically realizable. What the ablation result reveals is a distinction
+between \emph{which loss term selects the branch} and \emph{which physical property
+justifies the selected branch}. The variance regularization acts as an implicit
+selector of controls with larger spatial variance (in the sine basis, the
+sign-changing two-lobe profile over the positive single-lobe one); the dissipation
+objective then evaluates those controls. They reduce dissipation relative to the
+uniform lid, but under a strictly iso-energetic comparison the first harmonic is
+the least dissipative of the tested stationary profiles
+(Sec.~\ref{sec:focused_comparison}). Practitioners
 designing physics-informed control problems should be aware that the loss weight
 configuration may be as consequential as the physical objective in determining which
 branch is selected.
@@ -1403,10 +1436,13 @@ frequently accessible.
 \item \textbf{Branch accessibility depends on the optimization formulation.}
 The variance-regularization weight \(\lambda_{\mathrm{var}}\) is the dominant
 determinant of branch selection. At \(\lambda_{\mathrm{var}}=0\), all conditions
-yield exclusively \(B_{\mathrm{first}}\) outcomes; any positive
-\(\lambda_{\mathrm{var}}\) suppresses the first-harmonic branch, and increasing it
-further non-monotonically shifts accessibility between \(B_1\) and \(B_2\) in a way
-that depends on the operating point. The branch structure is jointly a property of
+yield exclusively \(B_{\mathrm{first}}\) outcomes. Suppression of the first-harmonic
+branch by a positive \(\lambda_{\mathrm{var}}\) is operating-point dependent: complete
+already at \(\lambda_{\mathrm{var}}=0.25\) for \((Re,E^*)=(500,0.25)\) and
+\((1000,1)\), but reached only at \(\lambda_{\mathrm{var}}=0.5\) for \((700,2)\).
+Increasing \(\lambda_{\mathrm{var}}\) further non-monotonically shifts accessibility
+between \(B_1\) and \(B_2\) in a way that depends on the operating point. The branch
+structure is jointly a property of
 the fluid problem and the variational formulation, not of the fluid problem alone.
 
 \item \textbf{Random initialization produces competing branches of comparable

@@ -110,18 +110,99 @@ coefficients, total loss, and frozen branch label.
 Six values of $\lambda_{\mathrm{var}}\in\{0,0.25,0.5,1,2,5\}$ at three
 operating points, $N_s=5$ seeds each (90 runs). Frequencies are reported in
 Table~3 of the main text. Finite-sample 95\% Wilson-score confidence
-intervals use
+intervals for an estimated frequency $\hat p=k/N_s$ use the standard
+center-plus-half-width formulation
 \[
-p\pm\frac{z}{\sqrt{N_s}}\sqrt{\frac{\hat p(1-\hat p)}{N_s}+\frac{z^2}{4N_s^2}}
-\,\Big/\left(1+\frac{z^2}{N_s}\right),\qquad z=1.96.
+C=\frac{\hat p+z^2/(2N_s)}{1+z^2/N_s},\qquad
+h=\frac{z}{1+z^2/N_s}\sqrt{\frac{\hat p(1-\hat p)}{N_s}+\frac{z^2}{4N_s^2}},
+\qquad z=1.96,
 \]
-For $N_s=5$ and $\hat p=0$, $0.2$, $0.4$, $0.6$, $1.0$ the half-widths are
-$0.31$, $0.43$, $0.47$, $0.43$, $0.31$, respectively. All realizations are
-classified with the four-class rule of Sec.~S3. At $\lambda_{\mathrm{var}}=0$ every
-one of the 15 realizations is $B_{\mathrm{first}}$ (first harmonic,
-$f_1>0.5$); these were grouped with $B_3$ under the original three-class scheme.
-The corrected per-cell frequencies and entropies (normalised by $\ln4$) are those
-of Table~3 of the main text.
+with interval $[\max(0,C-h),\min(1,C+h)]$. For $N_s=5$ the resulting
+intervals are: $0/5\colon[0.000,0.434]$,
+$1/5\colon[0.036,0.625]$,
+$2/5\colon[0.118,0.769]$,
+$3/5\colon[0.231,0.882]$,
+$4/5\colon[0.375,0.964]$, and
+$5/5\colon[0.566,1.000]$.
+
+\begin{table}[h]
+\centering\small
+\caption{90-run $\lambda_{\mathrm{var}}$ campaign: per-cell empirical frequency
+$k/N_s$ and 95\% Wilson-score interval for each of the four branch classes
+(corresponding to Table~3 of the main text).}
+\label{tab:S4a}
+\begin{tabular}{cccccc}
+\toprule
+$(Re,E^*)$ & $\lambda_{\mathrm{var}}$ & $B_1$ & $B_2$ & $B_{\mathrm{first}}$ & $B_3$\\
+\midrule
+(500,0.25) & 0.0  & 0/5 --- & 0/5 --- & 5/5 $[0.566,1.000]$ & 0/5 ---\\
+(500,0.25) & 0.25 & 3/5 $[0.231,0.882]$ & 2/5 $[0.118,0.769]$ & 0/5 --- & 0/5 ---\\
+(500,0.25) & 0.5  & 2/5 $[0.118,0.769]$ & 1/5 $[0.036,0.625]$ & 0/5 --- & 2/5 $[0.118,0.769]$\\
+(500,0.25) & 1.0  & 2/5 $[0.118,0.769]$ & 1/5 $[0.036,0.625]$ & 0/5 --- & 2/5 $[0.118,0.769]$\\
+(500,0.25) & 2.0  & 2/5 $[0.118,0.769]$ & 2/5 $[0.118,0.769]$ & 0/5 --- & 1/5 $[0.036,0.625]$\\
+(500,0.25) & 5.0  & 2/5 $[0.118,0.769]$ & 3/5 $[0.231,0.882]$ & 0/5 --- & 0/5 ---\\
+\addlinespace
+(700,2.0)  & 0.0  & 0/5 --- & 0/5 --- & 5/5 $[0.566,1.000]$ & 0/5 ---\\
+(700,2.0)  & 0.25 & 0/5 --- & 0/5 --- & 5/5 $[0.566,1.000]$ & 0/5 ---\\
+(700,2.0)  & 0.5  & 0/5 --- & 3/5 $[0.231,0.882]$ & 0/5 --- & 2/5 $[0.118,0.769]$\\
+(700,2.0)  & 1.0  & 1/5 $[0.036,0.625]$ & 2/5 $[0.118,0.769]$ & 0/5 --- & 2/5 $[0.118,0.769]$\\
+(700,2.0)  & 2.0  & 3/5 $[0.231,0.882]$ & 1/5 $[0.036,0.625]$ & 0/5 --- & 1/5 $[0.036,0.625]$\\
+(700,2.0)  & 5.0  & 3/5 $[0.231,0.882]$ & 1/5 $[0.036,0.625]$ & 0/5 --- & 1/5 $[0.036,0.625]$\\
+\addlinespace
+(1000,1.0) & 0.0  & 0/5 --- & 0/5 --- & 5/5 $[0.566,1.000]$ & 0/5 ---\\
+(1000,1.0) & 0.25 & 0/5 --- & 3/5 $[0.231,0.882]$ & 0/5 --- & 2/5 $[0.118,0.769]$\\
+(1000,1.0) & 0.5  & 2/5 $[0.118,0.769]$ & 2/5 $[0.118,0.769]$ & 0/5 --- & 1/5 $[0.036,0.625]$\\
+(1000,1.0) & 1.0  & 2/5 $[0.118,0.769]$ & 2/5 $[0.118,0.769]$ & 0/5 --- & 1/5 $[0.036,0.625]$\\
+(1000,1.0) & 2.0  & 2/5 $[0.118,0.769]$ & 2/5 $[0.118,0.769]$ & 0/5 --- & 1/5 $[0.036,0.625]$\\
+(1000,1.0) & 5.0  & 2/5 $[0.118,0.769]$ & 3/5 $[0.231,0.882]$ & 0/5 --- & 0/5 ---\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All realizations are classified with the four-class rule of Sec.~S3. At
+$\lambda_{\mathrm{var}}=0$ every one of the 15 realizations is
+$B_{\mathrm{first}}$ ($f_1>0.5$); these were grouped with $B_3$ under the
+original three-class scheme. At $(700,2)$ and $\lambda_{\mathrm{var}}=0.25$ the
+first-harmonic branch also survives in 5/5 realizations
+($f_1\in[0.544,0.646]$), which were likewise labeled $B_3$ (mixed) under the
+original scheme and are identified as $B_{\mathrm{first}}$ under the corrected
+rule. Table~S4b identifies every $B_{\mathrm{first}}$ realization of the 90-run
+campaign by its first-harmonic fraction and corrected label.
+
+\begin{table}[h]
+\centering\small
+\caption{Per-realization data for the 20 $B_{\mathrm{first}}$ outcomes of the
+90-run campaign: 15 realizations at $\lambda_{\mathrm{var}}=0$ and 5 at
+$(Re,E^*)=(700,2)$ with $\lambda_{\mathrm{var}}=0.25$. $f_1$, $f_2$, and $f_t$
+are the first-harmonic, second-harmonic, and total time-dependent fractions.}
+\label{tab:S4b}
+\begin{tabular}{ccccclll}
+\toprule
+$Re$ & $E^*$ & $\lambda_{\mathrm{var}}$ & seed & $f_1$ & $f_2$ & $f_t$\\
+\midrule
+500 & 0.25 & 0.0 & 0 & 0.8988 & 0.0031 & 0.0541\\
+500 & 0.25 & 0.0 & 1 & 0.9357 & 0.0002 & 0.0301\\
+500 & 0.25 & 0.0 & 2 & 0.9107 & 0.0002 & 0.0467\\
+500 & 0.25 & 0.0 & 3 & 0.9290 & 0.0007 & 0.0343\\
+500 & 0.25 & 0.0 & 4 & 0.9251 & 0.0002 & 0.0399\\
+700 & 2.0  & 0.0 & 0 & 0.9862 & 0.0011 & 0.0112\\
+700 & 2.0  & 0.0 & 1 & 0.9817 & 0.0041 & 0.0135\\
+700 & 2.0  & 0.0 & 2 & 0.9306 & 0.0241 & 0.0446\\
+700 & 2.0  & 0.0 & 3 & 0.9539 & 0.0222 & 0.0193\\
+700 & 2.0  & 0.0 & 4 & 0.9768 & 0.0020 & 0.0191\\
+1000 & 1.0 & 0.0 & 0 & 0.9682 & 0.0062 & 0.0220\\
+1000 & 1.0 & 0.0 & 1 & 0.9709 & 0.0102 & 0.0182\\
+1000 & 1.0 & 0.0 & 2 & 0.8680 & 0.0012 & 0.1212\\
+1000 & 1.0 & 0.0 & 3 & 0.9721 & 0.0073 & 0.0203\\
+1000 & 1.0 & 0.0 & 4 & 0.9610 & 0.0005 & 0.0322\\
+700 & 2.0  & 0.25 & 0 & 0.6456 & 0.0047 & 0.1712\\
+700 & 2.0  & 0.25 & 1 & 0.5801 & 0.0988 & 0.2677\\
+700 & 2.0  & 0.25 & 2 & 0.5443 & 0.1897 & 0.1766\\
+700 & 2.0  & 0.25 & 3 & 0.6029 & 0.0517 & 0.3214\\
+700 & 2.0  & 0.25 & 4 & 0.6397 & 0.0079 & 0.3123\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{S5. Energy sweep and seed multiplicity}
 \label{sec:S5}
@@ -283,8 +364,8 @@ mc\_8x9 & 5 & 47.4 & 47.7 & 0.408 & 2/2/1\\
 \end{table}
 
 Every audited realization reproduces the frozen branch label of the original
-run; combined with the 0/185 discrepancies of the threshold re-classification
-(Sec.~S3), the branch taxonomy is internally consistent.
+run; combined with the 0/185 discrepancies of the threshold re-classification of
+the reference campaign (Sec.~S3), the branch taxonomy is internally consistent.
 
 \section{S11. Energy-matched comparison, trajectory tests, and B2 windows}
 \label{sec:S11}

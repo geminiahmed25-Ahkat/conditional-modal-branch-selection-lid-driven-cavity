@@ -99,8 +99,11 @@ and proposing to fix it in the revised version.
   **unchanged**, and all main conclusions hold.
 - The correction changes the interpretation of the **`lambda_var` sweep** and the
   **loss ablation**: at `lambda_var = 0` the model deterministically selects
-  `B_first` (not a disordered "mixed" control); any positive `lambda_var`
-  suppresses `B_first`. The "No L_var" result becomes `B_1 -> B_first` instead of
+  `B_first` (not a disordered "mixed" control). Suppression of `B_first` by a
+  positive `lambda_var` is **operating-point dependent**: complete at
+  `lambda_var = 0.25` for `(Re,E*) = (500,0.25)` and `(1000,1)`, while at
+  `(700,2)` the branch persists at `lambda_var = 0.25` and disappears at
+  `lambda_var = 0.5`. The "No L_var" result becomes `B_1 -> B_first` instead of
   `B_1 -> mixed`.
 - It strengthens the paper's message: the variance penalty **excludes** the
   lowest-dissipation fundamental mode.
